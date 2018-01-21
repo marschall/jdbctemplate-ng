@@ -4,11 +4,11 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
-public class JdbcTemplate {
+public class JdbcTemplateNg {
 
   private final DataSource dataSource;
 
-  public JdbcTemplate(DataSource dataSource) {
+  public JdbcTemplateNg(DataSource dataSource) {
     Objects.requireNonNull(dataSource, "dataSource");
     this.dataSource = dataSource;
   }
