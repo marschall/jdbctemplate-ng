@@ -9,7 +9,7 @@ import java.util.stream.Collector;
 
 import javax.sql.DataSource;
 
-class SelectPipeline<T, R, A> {
+class QueryPipeline<T, R, A> {
 
   private PreparedStatementCreator creator;
 

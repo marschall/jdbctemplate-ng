@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class RowProcessor<T> {
+public class QueryRowProcessor<T> {
 
   public <R, A> R collect(Collector<? super T, A, R> collector) {
     return null;
