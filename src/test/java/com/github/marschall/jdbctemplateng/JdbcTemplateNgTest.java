@@ -1,19 +1,30 @@
 package com.github.marschall.jdbctemplateng;
 
 import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.h2.jdbcx.JdbcDataSource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class JdbcTemplateNgTest {
+class JdbcTemplateNgTest {
+
+  private JdbcDataSource dataSource;
+
+  @BeforeEach
+  void setUp() {
+    this.dataSource = new JdbcDataSource();
+    this.dataSource.setUrl("jdbc:h2:mem:");
+  }
 
   @Test
-  public void testToList() {
-    List<Integer> integers = new JdbcTemplateNg(null)
+  void testToList() {
+    List<Integer> integers = new JdbcTemplateNg(this.dataSource)
       .query("SELECT 1 FROM dual WHERE ? > 1")
       .binding(23)
       .forObject(Integer.class)
@@ -22,8 +33,8 @@ public class JdbcTemplateNgTest {
   }
 
   @Test
-  public void testToOptional() {
-    Optional<Integer> integers = new JdbcTemplateNg(null)
+  void testToOptional() {
+    Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(23)
             .forObject(Integer.class)
@@ -32,10 +43,22 @@ public class JdbcTemplateNgTest {
   }
 
   @Test
-  public void testBatchUpdate() {
-    Optional<Integer> integers = new JdbcTemplateNg(null)
+  void testUpdate() {
+      Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
+              .update("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
+              .binding(23)
+              .forObject(Integer.class)
+              .collect(toOptional());
+      assertNotNull(integers);
+  }
+
+  @Test
+  void testBatchUpdate() {
+    List<Object[]> batchArgs = Collections.emptyList();
+    int batchSize = 10;
+    Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
             .batchUpdate("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
-            .binding(23)
+            .binding(batchArgs)
             .forObject(Integer.class)
             .collect(toOptional());
     assertNotNull(integers);
