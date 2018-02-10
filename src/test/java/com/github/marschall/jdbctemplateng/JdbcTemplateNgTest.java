@@ -1,6 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
 import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.sql.Statement;
@@ -30,16 +31,29 @@ class JdbcTemplateNgTest {
       .forObject(Integer.class)
       .toList();
     assertNotNull(integers);
+    assertEquals(Collections.singletonList(1), integers);
   }
 
   @Test
-  void testToOptional() {
-    Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
+  void testToOptionalPresent() {
+    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(23)
             .forObject(Integer.class)
             .collect(toOptional());
-    assertNotNull(integers);
+    assertNotNull(integer);
+    assertEquals(Optional.of(1), integer);
+  }
+
+  @Test
+  void testToOptionalNotPresent() {
+    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
+            .query("SELECT 1 FROM dual WHERE ? > 1")
+            .binding(0)
+            .forObject(Integer.class)
+            .collect(toOptional());
+    assertNotNull(integer);
+    assertEquals(Optional.empty(), integer);
   }
 
   @Test

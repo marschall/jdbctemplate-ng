@@ -11,16 +11,33 @@ import javax.sql.DataSource;
 
 class QueryPipeline<T, R, A> {
 
-  private PreparedStatementCreator creator;
+  private final PreparedStatementCreator creator;
 
-  private PreparedStatementSetter setter;
+  private final PreparedStatementSetter setter;
 
-  private RowMapper<T> mapper;
+  private final RowMapper<T> mapper;
 
-  private Collector<? super T, A, R> collector;
+  private final Collector<? super T, A, R> collector;
 
-  private DataSource dataSource;
+  private final DataSource dataSource;
 
+
+  QueryPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper, Collector<? super T, A, R> collector) {
+    this.dataSource = dataSource;
+    this.creator = creator;
+    this.setter = setter;
+    this.mapper = mapper;
+    this.collector = collector;
+  }
+
+
+  R executeTranslated() {
+    try {
+      return this.execute();
+    } catch (SQLException e) {
+      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+    }
+  }
 
   R execute() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();

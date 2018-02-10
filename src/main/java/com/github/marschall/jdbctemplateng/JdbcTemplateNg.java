@@ -14,7 +14,7 @@ public class JdbcTemplateNg {
   }
 
   public QueryUnboundStatementProcessor query(PreparedStatementCreator preparedStatementCreator) {
-    return null;
+    return new QueryUnboundStatementProcessor(this.dataSource, preparedStatementCreator);
   }
 
   public QueryUnboundStatementProcessor query(String sql) {

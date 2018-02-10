@@ -1,9 +1,21 @@
 package com.github.marschall.jdbctemplateng;
 
+import javax.sql.DataSource;
+
 public class QueryBoundStatementProcessor {
 
+  private final DataSource dataSource;
+  private final PreparedStatementCreator creator;
+  private final PreparedStatementSetter setter;
+
+  QueryBoundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
+    this.dataSource = dataSource;
+    this.creator = creator;
+    this.setter = setter;
+  }
+
   public <T> QueryRowProcessor<T> mapping(RowMapper<T> rowMapper) {
-    return null;
+    return new QueryRowProcessor<T>(this.dataSource, this.creator, this.setter, rowMapper);
   }
 
   public <T> QueryRowProcessor<T> forObject(Class<T> requiredType) {
