@@ -58,12 +58,11 @@ class JdbcTemplateNgTest {
 
   @Test
   void testUpdate() {
-      Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
+      int updateCount = new JdbcTemplateNg(this.dataSource)
               .update("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
               .binding(23)
-              .forObject(Integer.class)
-              .collect(toOptional());
-      assertNotNull(integers);
+              .execute());
+      assertEquals(1, updateCount);
   }
 
   @Test
