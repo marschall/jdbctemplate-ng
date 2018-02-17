@@ -6,19 +6,14 @@ import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCustomizer;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
-public class QueryUnboundStatementProcessor {
-
-  private final DataSource dataSource;
-
-  private final PreparedStatementCreator creator;
+public class QueryUnboundStatementProcessor extends UnboundStatementProcessor {
 
   QueryUnboundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator) {
-    this.dataSource = dataSource;
-    this.creator = creator;
+    super(dataSource, creator);
   }
 
   public QueryBoundStatementProcessor binding(PreparedStatementSetter preparedStatementSetter) {
-    return new QueryBoundStatementProcessor(dataSource, creator, preparedStatementSetter);
+    return new QueryBoundStatementProcessor(this.dataSource, this.creator, preparedStatementSetter);
   }
 
   public QueryBoundStatementProcessor binding(Object... bindParameters) {
@@ -30,14 +25,6 @@ public class QueryUnboundStatementProcessor {
   }
 
   public QueryUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
-    PreparedStatementCreator decorated;
-    if (this.creator instanceof DecoratedPreparedStatementCreator) {
-      // TODO copy instead of modify?
-      ((DecoratedPreparedStatementCreator) this.creator).addCustomizer(customizer);
-      decorated = this.creator;
-    } else {
-      decorated = new DecoratedPreparedStatementCreator(this.creator, customizer);
-    }
-    return new QueryUnboundStatementProcessor(dataSource, decorated);
+    return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer));
   }
 }
