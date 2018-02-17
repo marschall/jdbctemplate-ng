@@ -25,7 +25,6 @@ class QueryPipeline<T, R, A> {
 
   private final DataSource dataSource;
 
-
   QueryPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper, Collector<? super T, A, R> collector) {
     this.dataSource = dataSource;
     this.creator = creator;
@@ -33,7 +32,6 @@ class QueryPipeline<T, R, A> {
     this.mapper = mapper;
     this.collector = collector;
   }
-
 
   R executeTranslated() {
     try {
@@ -67,6 +65,5 @@ class QueryPipeline<T, R, A> {
       }
     }
   }
-
 
 }

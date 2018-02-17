@@ -3,7 +3,10 @@ package com.github.marschall.jdbctemplateng;
 import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.List;
@@ -46,8 +49,6 @@ class JdbcTemplateNgTest {
     assertEquals(Collections.singletonList(1), integers);
   }
 
-
-
   @Test
   void withoutBindVariables() {
     // TODO statement instead?
@@ -77,11 +78,29 @@ class JdbcTemplateNgTest {
   }
 
   @Test
+  void testUpdateWithGeneratedKeys() throws SQLException {
+    try (Connection connection = this.dataSource.getConnection();
+         Statement statement = connection.createStatement()) {
+      statement.execute("CREATE TABLE test_talbe ("
+              + "id IDENTITY PRIMARY KEY"
+              + ")");
+      // Statement.RETURN_GENERATED_KEYS
+    }
+  }
+
+  @Test
   void testUpdate() {
+    try (Connection connection = this.dataSource.getConnection();
+            Statement statement = connection.createStatement()) {
+         statement.execute("CREATE TABLE test_talbe ("
+                 + "id INTEGER PRIMARY KEY"
+                 + ")");
+         // Statement.RETURN_GENERATED_KEYS
+       }
       int updateCount = new JdbcTemplateNg(this.dataSource)
-              .update("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
+              .update("INSERT INTO test_talbe(id) VALUES (?)")
               .binding(23)
-              .execute());
+              .execute();
       assertEquals(1, updateCount);
   }
 
