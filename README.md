@@ -7,6 +7,10 @@ This project has the following goals
 - reduce the number of methods on JdbcOperations
 - support named parameters
 
+additional features
+- more control over return type by use of a collector
+- statemet customizer allows to set fetch size without having to create a prepared statement creator
+
 non-goals
 
 features not supported:
@@ -16,8 +20,8 @@ features not supported:
 
 TODO
 ====
-- updates
 - batch updates
+- connection customizer for readonly
 
 ???
 ===

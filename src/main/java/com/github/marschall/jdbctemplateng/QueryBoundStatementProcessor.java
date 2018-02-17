@@ -6,10 +6,12 @@ import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
 
-public class QueryBoundStatementProcessor {
+public final class QueryBoundStatementProcessor {
 
   private final DataSource dataSource;
+
   private final PreparedStatementCreator creator;
+
   private final PreparedStatementSetter setter;
 
   QueryBoundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {

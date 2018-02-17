@@ -2,6 +2,8 @@ package com.github.marschall.jdbctemplateng;
 
 import java.sql.SQLException;
 
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
+
 /**
  * A {@link SQLExceptionAdapter} that creates a new {@link UncheckedSQLException}.
  */
