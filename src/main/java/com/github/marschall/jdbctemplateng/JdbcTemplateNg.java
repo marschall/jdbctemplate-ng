@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+
 public class JdbcTemplateNg {
 
   private final DataSource dataSource;

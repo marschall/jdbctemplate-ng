@@ -18,7 +18,6 @@ TODO
 ====
 - updates
 - batch updates
-- statement customizer, fetch size, other things
 
 ???
 ===

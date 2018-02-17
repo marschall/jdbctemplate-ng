@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.RowMapper;
+
 public class QueryRowProcessor<T> {
 
   private final DataSource dataSource;

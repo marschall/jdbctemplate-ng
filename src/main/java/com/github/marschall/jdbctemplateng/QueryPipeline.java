@@ -9,6 +9,10 @@ import java.util.stream.Collector;
 
 import javax.sql.DataSource;
 
+import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.RowMapper;
+
 class QueryPipeline<T, R, A> {
 
   private final PreparedStatementCreator creator;

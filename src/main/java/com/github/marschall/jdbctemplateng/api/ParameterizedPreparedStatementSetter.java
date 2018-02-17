@@ -1,4 +1,4 @@
-package com.github.marschall.jdbctemplateng;
+package com.github.marschall.jdbctemplateng.api;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

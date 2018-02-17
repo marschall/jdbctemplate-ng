@@ -35,6 +35,26 @@ class JdbcTemplateNgTest {
   }
 
   @Test
+  void customizeStatement() {
+    List<Integer> integers = new JdbcTemplateNg(this.dataSource)
+            .query("SELECT 1 FROM dual")
+            .customizeStatement(statement -> statement.setFetchSize(1))
+            .binding()
+            .forObject(Integer.class)
+            .toList();
+    assertNotNull(integers);
+    assertEquals(Collections.singletonList(1), integers);
+  }
+
+
+
+  @Test
+  void withoutBindVariables() {
+    // TODO statement instead?
+    fail("not yet implemented");
+  }
+
+  @Test
   void testToOptionalPresent() {
     Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
             .query("SELECT 1 FROM dual WHERE ? > 1")
