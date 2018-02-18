@@ -20,6 +20,11 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
     return this.binding(preparedStatementSetter(bindParameters));
   }
 
+  // REVIEW can we skip this
+  public QueryBoundStatementProcessor withoutBindParameters() {
+    return this.binding(statement -> {});
+  }
+
   public QueryUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
     return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer));
   }

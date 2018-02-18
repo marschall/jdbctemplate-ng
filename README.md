@@ -22,6 +22,7 @@ TODO
 ====
 - batch updates
 - connection customizer for readonly
+- unprepared statement for statements without bind parameters
 
 ???
 ===

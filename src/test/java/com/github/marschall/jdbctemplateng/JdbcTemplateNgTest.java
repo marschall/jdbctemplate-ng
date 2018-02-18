@@ -1,6 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
 import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -23,10 +24,12 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -36,6 +39,8 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.github.marschall.jdbctemplateng.api.RowMapper;
 
 class JdbcTemplateNgTest {
 
@@ -72,7 +77,7 @@ class JdbcTemplateNgTest {
     List<Integer> integers = new JdbcTemplateNg(this.dataSource)
             .query("SELECT 1 FROM dual")
             .customizeStatement(statement -> statement.setFetchSize(1))
-            .binding()
+            .withoutBindParameters()
             .forObject(Integer.class)
             .toList();
     assertNotNull(integers);
@@ -80,9 +85,37 @@ class JdbcTemplateNgTest {
   }
 
   @Test
+  void queryForMap() {
+    List<Map<String, Object>> values = new JdbcTemplateNg(this.dataSource)
+            .query("SELECT 1, '2' as TWO FROM dual")
+            .withoutBindParameters()
+            .mapping(RowMapper.toMap())
+            .toList();
+
+    assertNotNull(values);
+    assertThat(values).hasSize(1);
+
+    Map<String, Object> row = values.get(0);
+
+    Set<String> expected = new HashSet<>(4);
+    expected.add("1");
+    expected.add("TWO");
+    assertEquals(expected, row.keySet());
+
+    assertEquals(Integer.valueOf(1), row.get("1"));
+    assertEquals("2", row.get("TWO"));
+  }
+
+  @Test
   void withoutBindVariables() {
     // TODO statement instead?
-    fail("not yet implemented");
+    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
+            .query("SELECT 1 FROM dual")
+            .withoutBindParameters()
+            .forObject(Integer.class)
+            .collect(toOptional());
+    assertNotNull(integer);
+    assertEquals(Optional.of(1), integer);
   }
 
   @Test
