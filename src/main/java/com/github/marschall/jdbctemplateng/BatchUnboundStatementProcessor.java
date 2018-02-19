@@ -4,7 +4,6 @@ import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCustomizer;
-import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
 public final class BatchUnboundStatementProcessor  extends UnboundStatementProcessor {
 
