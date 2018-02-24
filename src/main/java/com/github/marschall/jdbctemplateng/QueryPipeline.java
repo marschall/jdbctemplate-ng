@@ -15,6 +15,8 @@ import com.github.marschall.jdbctemplateng.api.RowMapper;
 
 class QueryPipeline<T, R, A> {
 
+  private final DataSource dataSource;
+
   private final PreparedStatementCreator creator;
 
   private final PreparedStatementSetter setter;
@@ -23,7 +25,6 @@ class QueryPipeline<T, R, A> {
 
   private final Collector<? super T, A, R> collector;
 
-  private final DataSource dataSource;
 
   QueryPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper, Collector<? super T, A, R> collector) {
     this.dataSource = dataSource;
