@@ -9,15 +9,15 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
-final class UpdatePipeline {
+final class UpdateForRowCountPipeline {
+
+  private final DataSource dataSource;
 
   private final PreparedStatementCreator creator;
 
   private final PreparedStatementSetter setter;
 
-  private final DataSource dataSource;
-
-  UpdatePipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
+  UpdateForRowCountPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
     this.dataSource = dataSource;
     this.creator = creator;
     this.setter = setter;

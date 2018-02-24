@@ -75,7 +75,7 @@ class JdbcTemplateNgTest {
   void customizeStatement() {
     List<Integer> integers = new JdbcTemplateNg(this.dataSource)
             .query("SELECT 1 FROM dual")
-            .customizeStatement(statement -> statement.setFetchSize(1))
+            .fetchSize(1)
             .withoutBindParameters()
             .forObject(Integer.class)
             .toList();
@@ -143,10 +143,16 @@ class JdbcTemplateNgTest {
   void testUpdateWithGeneratedKeys() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          Statement statement = connection.createStatement()) {
-      statement.execute("CREATE TABLE test_talbe ("
-              + "id IDENTITY PRIMARY KEY"
+      statement.execute("CREATE TABLE test_table ("
+              + "id IDENTITY PRIMARY KEY,"
+              + "test_value INT,"
               + ")");
-      // Statement.RETURN_GENERATED_KEYS
+      Long generatedKey =
+              new JdbcTemplateNg(this.dataSource)
+              .update("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
+              .binding(23)
+              .forGeneratedKey(Long.class);
+      assertEquals(Long.valueOf(1L), generatedKey);
     }
   }
 
@@ -157,11 +163,10 @@ class JdbcTemplateNgTest {
          statement.execute("CREATE TABLE test_table ("
                  + "id INTEGER PRIMARY KEY"
                  + ")");
-         // Statement.RETURN_GENERATED_KEYS
          new JdbcTemplateNg(this.dataSource)
                  .update("INSERT INTO test_table(id) VALUES (?)")
                  .binding(23)
-                 .expectUpdateCount(1);;
+                 .expectUpdateCount(1);
        }
   }
 
