@@ -25,6 +25,10 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
     return this.binding(statement -> {});
   }
 
+  public QueryUnboundStatementProcessor fetchSize(int fetchSize) {
+    return this.customizeStatement(statement -> statement.setFetchSize(fetchSize));
+  }
+
   public QueryUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
     return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer));
   }
