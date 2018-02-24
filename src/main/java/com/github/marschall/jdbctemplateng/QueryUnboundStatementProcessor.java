@@ -17,7 +17,7 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
   }
 
   public QueryBoundStatementProcessor binding(Object... bindParameters) {
-    return this.binding(preparedStatementSetter(bindParameters));
+    return this.binding(this.preparedStatementSetter(bindParameters));
   }
 
   // REVIEW can we skip this

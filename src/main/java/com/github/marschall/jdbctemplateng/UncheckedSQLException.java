@@ -19,6 +19,11 @@ public final class UncheckedSQLException extends RuntimeException {
     this.sql = sql;
   }
 
+  UncheckedSQLException(String message, String sql) {
+    super(message);
+    this.sql = sql;
+  }
+
   /**
    * Returns the SQL query that was executed.
    *

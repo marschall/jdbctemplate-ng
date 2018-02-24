@@ -23,9 +23,20 @@ final class UpdatePipeline {
     this.setter = setter;
   }
 
-  int executeTranslated() {
+  int executeForUpdateCountTranslated() {
     try {
       return this.execute();
+    } catch (SQLException e) {
+      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+    }
+  }
+
+  void executeAndExpectUpdateCountTranslated(int expected) {
+    try {
+      int actual = this.execute();
+      if (actual != expected) {
+        throw UncheckedSQLExceptionAdapter.wrongUpdateCount(expected, actual, null);
+      }
     } catch (SQLException e) {
       throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
     }

@@ -16,13 +16,12 @@ public final class UpdateUnboundStatementProcessor extends UnboundStatementProce
     return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer));
   }
 
-  public int binding(PreparedStatementSetter preparedStatementSetter) {
-    UpdatePipeline pipeline = new UpdatePipeline(this.dataSource, this.creator, preparedStatementSetter);
-    return pipeline.executeTranslated();
+  public UpdateBoundStatementProcessor binding(PreparedStatementSetter setter) {
+    return new UpdateBoundStatementProcessor(this.dataSource, this.creator, setter);
   }
 
-  public int binding(Object... bindParameters) {
-    return this.binding(preparedStatementSetter(bindParameters));
+  public UpdateBoundStatementProcessor binding(Object... bindParameters) {
+    return this.binding(this.preparedStatementSetter(bindParameters));
   }
 
 }

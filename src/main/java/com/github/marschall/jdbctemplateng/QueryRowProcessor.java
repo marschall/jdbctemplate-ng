@@ -11,7 +11,7 @@ import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
 
-public class QueryRowProcessor<T> {
+public final class QueryRowProcessor<T> {
 
   private final DataSource dataSource;
   private final PreparedStatementCreator creator;
@@ -23,11 +23,10 @@ public class QueryRowProcessor<T> {
     this.creator = creator;
     this.setter = setter;
     this.rowMapper = rowMapper;
-    // TODO Auto-generated constructor stub
   }
 
   public <R, A> R collect(Collector<? super T, A, R> collector) {
-    QueryPipeline<T,R,A> pipeline = new QueryPipeline<T, R, A>(this.dataSource, this.creator, this.setter, this.rowMapper, collector);
+    QueryPipeline<T,R,A> pipeline = new QueryPipeline<>(this.dataSource, this.creator, this.setter, this.rowMapper, collector);
     return pipeline.executeTranslated();
   }
 
@@ -37,8 +36,7 @@ public class QueryRowProcessor<T> {
   }
 
   public Optional<T> toOptional() {
-    // TODO
-    return Optional.empty();
+    return this.collect(MoreCollectors.toOptional());
   }
 
 }
