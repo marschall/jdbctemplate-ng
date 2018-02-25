@@ -45,6 +45,7 @@ class JdbcTemplateNgTest {
 
   private DataSource dataSource;
   private Connection connection;
+  private JdbcTemplateNg jdbcTemplate;
 
   @BeforeEach
   void setUp() throws SQLException {
@@ -53,6 +54,7 @@ class JdbcTemplateNgTest {
 
     this.connection = h2dataSource.getConnection();
     this.dataSource = new SingleConnectionDataSource(this.connection, h2dataSource);
+    this.jdbcTemplate = new JdbcTemplateNg(this.dataSource);
   }
 
   @AfterEach
@@ -62,7 +64,7 @@ class JdbcTemplateNgTest {
 
   @Test
   void testToList() {
-    List<Integer> integers = new JdbcTemplateNg(this.dataSource)
+    List<Integer> integers = this.jdbcTemplate
       .query("SELECT 1 FROM dual WHERE ? > 1")
       .binding(23)
       .forObject(Integer.class)
@@ -73,7 +75,7 @@ class JdbcTemplateNgTest {
 
   @Test
   void customizeStatement() {
-    List<Integer> integers = new JdbcTemplateNg(this.dataSource)
+    List<Integer> integers = this.jdbcTemplate
             .query("SELECT 1 FROM dual")
             .fetchSize(1)
             .withoutBindParameters()
@@ -85,7 +87,7 @@ class JdbcTemplateNgTest {
 
   @Test
   void queryForMap() {
-    List<Map<String, Object>> values = new JdbcTemplateNg(this.dataSource)
+    List<Map<String, Object>> values = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
             .mapping(RowMapper.toMap())
@@ -108,7 +110,7 @@ class JdbcTemplateNgTest {
   @Test
   void withoutBindVariables() {
     // TODO statement instead?
-    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
+    Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual")
             .withoutBindParameters()
             .forObject(Integer.class)
@@ -119,7 +121,7 @@ class JdbcTemplateNgTest {
 
   @Test
   void testToOptionalPresent() {
-    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
+    Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(23)
             .forObject(Integer.class)
@@ -130,7 +132,7 @@ class JdbcTemplateNgTest {
 
   @Test
   void testToOptionalNotPresent() {
-    Optional<Integer> integer = new JdbcTemplateNg(this.dataSource)
+    Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(0)
             .forObject(Integer.class)
@@ -145,10 +147,10 @@ class JdbcTemplateNgTest {
          Statement statement = connection.createStatement()) {
       statement.execute("CREATE TABLE test_table ("
               + "id IDENTITY PRIMARY KEY,"
-              + "test_value INT,"
+              + "test_value INTEGER,"
               + ")");
       Long generatedKey =
-              new JdbcTemplateNg(this.dataSource)
+              this.jdbcTemplate
               .update("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
               .binding(23)
               .forGeneratedKey(Long.class);
@@ -163,7 +165,7 @@ class JdbcTemplateNgTest {
          statement.execute("CREATE TABLE test_table ("
                  + "id INTEGER PRIMARY KEY"
                  + ")");
-         new JdbcTemplateNg(this.dataSource)
+         this.jdbcTemplate
                  .update("INSERT INTO test_table(id) VALUES (?)")
                  .binding(23)
                  .expectUpdateCount(1);
@@ -174,7 +176,7 @@ class JdbcTemplateNgTest {
   void testBatchUpdate() {
     List<Object[]> batchArgs = Collections.emptyList();
     int batchSize = 10;
-    Optional<Integer> integers = new JdbcTemplateNg(this.dataSource)
+    Optional<Integer> integers = this.jdbcTemplate
             .batchUpdate("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
             .binding(batchArgs)
             .forObject(Integer.class)
