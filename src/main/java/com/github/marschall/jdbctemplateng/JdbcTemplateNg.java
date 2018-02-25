@@ -1,5 +1,8 @@
 package com.github.marschall.jdbctemplateng;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Objects;
 
 import javax.sql.DataSource;
@@ -13,6 +16,15 @@ public final class JdbcTemplateNg {
   public JdbcTemplateNg(DataSource dataSource) {
     Objects.requireNonNull(dataSource, "dataSource");
     this.dataSource = dataSource;
+  }
+
+  public void execute(String sql) {
+    try (Connection connection = this.dataSource.getConnection();
+         Statement statement = connection.createStatement()) {
+      statement.execute(sql);
+    } catch (SQLException e) {
+      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(sql, e);
+    }
   }
 
   public QueryUnboundStatementProcessor query(PreparedStatementCreator preparedStatementCreator) {
