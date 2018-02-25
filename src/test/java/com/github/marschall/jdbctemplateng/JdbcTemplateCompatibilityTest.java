@@ -42,6 +42,15 @@ public class JdbcTemplateCompatibilityTest {
   }
 
   @Test
+  void unnamedKeys() {
+    Map<String, Object> map = this.jdbcOperations.queryForMap("SELECT 1 + ? from dual", 1);
+
+    assertThat(map).hasSize(1);
+
+    assertEquals(Integer.valueOf(2), map.get("1 + ?1"));
+  }
+
+  @Test
   void caseSensitiveKeys() {
     List<Map<String, Object>> queryResult = this.jdbcOperations.query("SELECT 1 as \"X\", 2 as \"x\" from dual", (ResultSet resultSet) -> {
       List<Map<String, Object>> rows = new ArrayList<>();
