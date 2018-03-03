@@ -12,4 +12,8 @@ public interface NamedPreparedStatementSetterFactory {
     return OracleNamedPreparedStatementSetterFactory.INSTANCE;
   }
 
+  public static NamedPreparedStatementSetterFactory db2() {
+    return DB2NamedPreparedStatementSetterFactory.INSTANCE;
+  }
+
 }
