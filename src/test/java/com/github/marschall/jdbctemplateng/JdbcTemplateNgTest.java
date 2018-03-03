@@ -109,7 +109,6 @@ class JdbcTemplateNgTest {
 
   @Test
   void withoutBindVariables() {
-    // TODO statement instead?
     Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual")
             .withoutBindParameters()
