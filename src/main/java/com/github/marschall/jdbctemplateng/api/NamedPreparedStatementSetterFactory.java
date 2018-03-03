@@ -8,4 +8,8 @@ public interface NamedPreparedStatementSetterFactory {
 
   PreparedStatementSetter newNamedPreparedStatementSetter(Collection<Entry<String, Object>> namedParameters);
 
+  public static NamedPreparedStatementSetterFactory oracle() {
+    return OracleNamedPreparedStatementSetterFactory.INSTANCE;
+  }
+
 }

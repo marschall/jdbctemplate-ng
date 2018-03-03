@@ -24,6 +24,10 @@ final class UncheckedSQLExceptionAdapter implements SQLExceptionAdapter {
     }
   }
 
+  static RuntimeException unsupportedFeature(String featureName) {
+    return new UncheckedSQLException(featureName, null);
+  }
+
   static RuntimeException wrongUpdateCount(int expected, int actual, String sql) {
     // TODO instance variables
     return new UncheckedSQLException("wrong update count, expected " + expected + " but was " + actual, sql);
