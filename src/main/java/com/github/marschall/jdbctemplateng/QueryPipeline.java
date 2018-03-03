@@ -53,7 +53,7 @@ class QueryPipeline<T, R, A> {
         int rowNum = 0;
 
         while (resultSet.next()) {
-          T row = this.mapper.mapRow(resultSet, rowNum++);
+          T row = this.mapper.mapRow(resultSet);
           accumulator.accept(state, row);
         }
 

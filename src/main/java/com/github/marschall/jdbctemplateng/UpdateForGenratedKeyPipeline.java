@@ -50,7 +50,7 @@ final class UpdateForGenratedKeyPipeline<T> {
         if (!generatedKeys.next()) {
           throw UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 0, null);
         }
-        T generatedKey = this.mapper.mapRow(generatedKeys, 0);
+        T generatedKey = this.mapper.mapRow(generatedKeys);
         if (generatedKeys.next()) {
           throw UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 2, null);
         }

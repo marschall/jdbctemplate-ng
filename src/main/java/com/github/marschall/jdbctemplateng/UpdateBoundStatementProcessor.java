@@ -1,7 +1,5 @@
 package com.github.marschall.jdbctemplateng;
 
-import java.sql.ResultSet;
-
 import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
@@ -30,7 +28,7 @@ public final class UpdateBoundStatementProcessor extends BoundStatementProcessor
   }
 
   public <T> T forGeneratedKey(Class<T> type) {
-    return this.forGeneratedKey((ResultSet resultSet, int rowNum) -> resultSet.getObject(1, type));
+    return this.forGeneratedKey(resultSet -> resultSet.getObject(1, type));
   }
 
 }

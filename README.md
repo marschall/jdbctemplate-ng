@@ -17,6 +17,7 @@ features not supported:
 - java.util.Date <-> java.sql.Timestamp and java.util.Calendar <-> java.sql.Timestamp type conversions, use JSR-310 datatypes
 - work around JDBC driver bugs
 - get JDBC metadata
+- support rownum in RowMapper
 
 TODO
 ====

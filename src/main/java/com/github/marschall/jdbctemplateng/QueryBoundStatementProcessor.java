@@ -17,7 +17,7 @@ public final class QueryBoundStatementProcessor extends BoundStatementProcessor 
   }
 
   public <T> QueryRowProcessor<T> forObject(Class<T> requiredType) {
-    return this.mapping((resultSet, rowNum) -> resultSet.getObject(1, requiredType));
+    return this.mapping(resultSet -> resultSet.getObject(1, requiredType));
   }
 
 }

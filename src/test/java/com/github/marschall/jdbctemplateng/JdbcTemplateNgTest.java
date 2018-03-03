@@ -2,6 +2,7 @@ package com.github.marschall.jdbctemplateng;
 
 import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -22,6 +23,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +120,36 @@ class JdbcTemplateNgTest {
 
     assertEquals(Integer.valueOf(1), row.get("1"));
     assertEquals("2", row.get("TWO"));
+  }
+
+  @Test
+  void queryForList() {
+    List<List<Object>> values = this.jdbcTemplate
+            .query("SELECT 1, '2' as TWO FROM dual")
+            .withoutBindParameters()
+            .mapping(RowMapper.toList())
+            .toList();
+
+    assertNotNull(values);
+    assertThat(values).hasSize(1);
+
+    List<Object> row = values.get(0);
+    assertEquals(Arrays.asList(1, "2"), row);
+  }
+
+  @Test
+  void queryForArray() {
+    List<Object[]> values = this.jdbcTemplate
+            .query("SELECT 1, '2' as TWO FROM dual")
+            .withoutBindParameters()
+            .mapping(RowMapper.toArray())
+            .toList();
+
+    assertNotNull(values);
+    assertThat(values).hasSize(1);
+
+    Object[] row = values.get(0);
+    assertArrayEquals(new Object[] {1, "2"}, row);
   }
 
   @Test
