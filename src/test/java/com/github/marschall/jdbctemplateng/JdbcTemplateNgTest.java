@@ -35,7 +35,9 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.h2.jdbcx.JdbcDataSource;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,23 +45,34 @@ import com.github.marschall.jdbctemplateng.api.RowMapper;
 
 class JdbcTemplateNgTest {
 
-  private DataSource dataSource;
-  private Connection connection;
+  private static DataSource dataSource;
+  private static Connection connection;
+
   private JdbcTemplateNg jdbcTemplate;
 
-  @BeforeEach
-  void setUp() throws SQLException {
+  @BeforeAll
+  static void setUpConnection() throws SQLException {
     JdbcDataSource h2dataSource = new JdbcDataSource();
     h2dataSource.setUrl("jdbc:h2:mem:");
 
-    this.connection = h2dataSource.getConnection();
-    this.dataSource = new SingleConnectionDataSource(this.connection, h2dataSource);
-    this.jdbcTemplate = new JdbcTemplateNg(this.dataSource);
+    connection = h2dataSource.getConnection();
+
+    dataSource = new SingleConnectionDataSource(connection, h2dataSource);
+  }
+
+  @AfterAll
+  static void tearDownConnection() throws SQLException {
+    connection.close();
+  }
+
+  @BeforeEach
+  void setUp() {
+    this.jdbcTemplate = new JdbcTemplateNg(dataSource);
   }
 
   @AfterEach
-  void tearDown() throws SQLException {
-    this.connection.close();
+  void tearDown() {
+    this.jdbcTemplate.execute("DROP TABLE test_table IF EXISTS");
   }
 
   @Test
