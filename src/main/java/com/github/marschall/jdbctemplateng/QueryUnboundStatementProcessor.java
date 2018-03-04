@@ -1,14 +1,13 @@
 package com.github.marschall.jdbctemplateng;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.sql.DataSource;
-
-import org.assertj.core.util.Arrays;
 
 import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFactory;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
@@ -35,6 +34,39 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
   public QueryBoundStatementProcessor binding(String parameterName, Object parameterValue) {
     Objects.requireNonNull(parameterName, "parameterName");
     return binding(Collections.singletonList(new SimpleEntry(parameterName, parameterValue)));
+  }
+
+  public QueryBoundStatementProcessor binding(String parameterName1, Object parameterValue1,
+                                              String parameterName2, Object parameterValue2) {
+    Objects.requireNonNull(parameterName1, "parameterName1");
+    Objects.requireNonNull(parameterName2, "parameterName2");
+    return binding(Arrays.asList(new SimpleEntry(parameterName1, parameterValue1),
+                                 new SimpleEntry(parameterName2, parameterValue2)));
+  }
+
+  public QueryBoundStatementProcessor binding(String parameterName1, Object parameterValue1,
+                                              String parameterName2, Object parameterValue2,
+                                              String parameterName3, Object parameterValue3) {
+    Objects.requireNonNull(parameterName1, "parameterName1");
+    Objects.requireNonNull(parameterName2, "parameterName2");
+    Objects.requireNonNull(parameterName3, "parameterName3");
+    return binding(Arrays.asList(new SimpleEntry(parameterName1, parameterValue1),
+                                 new SimpleEntry(parameterName2, parameterValue2),
+                                 new SimpleEntry(parameterName3, parameterValue3)));
+  }
+
+  public QueryBoundStatementProcessor binding(String parameterName1, Object parameterValue1,
+                                              String parameterName2, Object parameterValue2,
+                                              String parameterName3, Object parameterValue3,
+                                              String parameterName4, Object parameterValue4) {
+    Objects.requireNonNull(parameterName1, "parameterName1");
+    Objects.requireNonNull(parameterName2, "parameterName2");
+    Objects.requireNonNull(parameterName3, "parameterName3");
+    Objects.requireNonNull(parameterName4, "parameterName4");
+    return binding(Arrays.asList(new SimpleEntry(parameterName1, parameterValue1),
+                                 new SimpleEntry(parameterName2, parameterValue2),
+                                 new SimpleEntry(parameterName3, parameterValue3),
+                                 new SimpleEntry(parameterName4, parameterValue4)));
   }
 
   public QueryBoundStatementProcessor binding(Map<String, Object> parameters) {

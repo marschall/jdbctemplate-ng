@@ -39,4 +39,12 @@ public final class QueryRowProcessor<T> {
     return this.collect(MoreCollectors.toOptional());
   }
 
+  public T toUniqueObject() {
+    // TODO should probably be optimized
+    return this.toOptional().orElseThrow(() -> {
+      // TODO better exception
+      return UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 0, null);
+    });
+  }
+
 }

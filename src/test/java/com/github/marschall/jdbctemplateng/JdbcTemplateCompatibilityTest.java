@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.github.marschall.jdbctemplateng.JdbcTemplateCompatibilityTest.TestConfiguration;
 
 @SpringJUnitConfig(TestConfiguration.class)
-public class JdbcTemplateCompatibilityTest {
+class JdbcTemplateCompatibilityTest {
 
   @Autowired
   private JdbcOperations jdbcOperations;

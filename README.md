@@ -9,15 +9,17 @@ This project has the following goals
 
 additional features
 - more control over return type by use of a collector
-- statemet customizer allows to set fetch size without having to create a prepared statement creator
+- statement customizer allows to set fetch size without having to create a prepared statement creator
 
 non-goals
 
 features not supported:
 - java.util.Date <-> java.sql.Timestamp and java.util.Calendar <-> java.sql.Timestamp type conversions, use JSR-310 datatypes
 - work around JDBC driver bugs
-- get JDBC metadata
+- consider JDBC metadata
+- jdbc type support
 - support rownum in RowMapper
+- support stored procedures
 
 TODO
 ====

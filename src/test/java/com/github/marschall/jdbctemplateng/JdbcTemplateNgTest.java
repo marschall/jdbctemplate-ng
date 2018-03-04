@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.PrintWriter;
 import java.sql.Array;
@@ -172,6 +173,27 @@ class JdbcTemplateNgTest {
             .toOptional();
     assertNotNull(integer);
     assertEquals(Optional.of(1), integer);
+  }
+
+  @Test
+  void testToUniqueObjectPresent() {
+    Integer integer = this.jdbcTemplate
+            .query("SELECT 1 FROM dual")
+            .withoutBindParameters()
+            .forObject(Integer.class)
+            .toUniqueObject();
+    assertEquals(Integer.valueOf(1), integer);
+  }
+
+  @Test
+  void testToUniqueObjectNotPresent() {
+    assertThrows(UncheckedSQLException.class, () -> {
+      this.jdbcTemplate
+      .query("SELECT 1 FROM dual WHERE 2 < 1")
+      .withoutBindParameters()
+      .forObject(Integer.class)
+      .toUniqueObject();
+    });
   }
 
   @Test
