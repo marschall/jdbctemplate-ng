@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.BiConsumer;
 import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 
 import javax.sql.DataSource;
 
@@ -50,19 +51,18 @@ class QueryPipeline<T, R, A> {
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         A state = this.collector.supplier().get();
         BiConsumer<A, ? super T> accumulator = this.collector.accumulator();
-        int rowNum = 0;
 
         while (resultSet.next()) {
           T row = this.mapper.mapRow(resultSet);
           accumulator.accept(state, row);
         }
 
-        // TODO
-//        if (this.collector.characteristics().contains(Characteristics.IDENTITY_FINISH)) {
-//
-//        }
+        if (this.collector.characteristics().contains(Characteristics.IDENTITY_FINISH)) {
+          return (R) state;
+        } else {
+          return this.collector.finisher().apply(state);
+        }
 
-        return this.collector.finisher().apply(state);
       }
     }
   }

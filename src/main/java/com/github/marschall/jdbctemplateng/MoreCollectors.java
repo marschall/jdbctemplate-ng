@@ -21,7 +21,7 @@ public final class MoreCollectors {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> Collector<T, ?, Optional<T>> toOptional(){
+  public static <T> Collector<T, ?, Optional<T>> toOptional() {
     return OPTIONAL_COLLECTOR;
   }
 
@@ -50,6 +50,11 @@ public final class MoreCollectors {
     @Override
     public Set<Characteristics> characteristics() {
       return Collections.emptySet();
+    }
+
+    @Override
+    public String toString() {
+      return "MoreCollectors.toOptional()";
     }
 
   }
