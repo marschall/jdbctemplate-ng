@@ -1,5 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
+import java.util.Objects;
+
 import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFactory;
@@ -14,14 +16,17 @@ public final class UpdateUnboundStatementProcessor extends UnboundStatementProce
   }
 
   public QueryUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
+    Objects.requireNonNull(customizer, "customizer");
     return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer), this.namedFactory);
   }
 
-  public UpdateBoundStatementProcessor binding(PreparedStatementSetter setter) {
-    return new UpdateBoundStatementProcessor(this.dataSource, this.creator, setter);
+  public UpdateBoundStatementProcessor binding(PreparedStatementSetter preparedStatementSetter) {
+    Objects.requireNonNull(preparedStatementSetter, "preparedStatementSetter");
+    return new UpdateBoundStatementProcessor(this.dataSource, this.creator, preparedStatementSetter);
   }
 
   public UpdateBoundStatementProcessor binding(Object... bindParameters) {
+    Objects.requireNonNull(bindParameters, "bindParameters");
     return this.binding(this.preparedStatementSetter(bindParameters));
   }
 

@@ -18,6 +18,7 @@ public final class BatchUnboundStatementProcessor extends UnboundStatementProces
   }
 
   public BatchUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
+    Objects.requireNonNull(customizer, "customizer");
     return new BatchUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer), this.namedFactory);
   }
 
