@@ -33,6 +33,11 @@ final class UncheckedSQLExceptionAdapter implements SQLExceptionAdapter {
     return new UncheckedSQLException("wrong update count, expected " + expected + " but was " + actual, sql);
   }
 
+  static RuntimeException wrongUpdateCount(long expected, long actual, String sql) {
+    // TODO instance variables
+    return new UncheckedSQLException("wrong update count, expected " + expected + " but was " + actual, sql);
+  }
+
   static RuntimeException wrongResultSetSize(int expected, int actual, String sql) {
     // TODO instance variables
     return new UncheckedSQLException("wrong ResultSet size, expected " + expected + " but was " + actual, sql);

@@ -39,7 +39,7 @@ public final class BatchBoundStatementProcessor<T> {
   }
 
   public int[][] forPerBatchUpdateCount() {
-    BatchUpdatePipeline<T> pipeline = new BatchUpdatePipeline<T>(this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
+    BatchForUpdateCountUpdatePipeline<T> pipeline = new BatchForUpdateCountUpdatePipeline<T>(this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
     return pipeline.executeForPerBatchUpdateCountTranslated();
   }
 

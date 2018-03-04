@@ -13,12 +13,22 @@ public final class UpdateBoundStatementProcessor extends BoundStatementProcessor
   }
 
   public int forUpdateCount() {
-    UpdateForRowCountPipeline pipeline = new UpdateForRowCountPipeline(this.dataSource, this.creator, this.setter);
+    UpdateForUpdateCountPipeline pipeline = new UpdateForUpdateCountPipeline(this.dataSource, this.creator, this.setter);
     return pipeline.executeForUpdateCountTranslated();
   }
 
   public void expectUpdateCount(int expected) {
-    UpdateForRowCountPipeline pipeline = new UpdateForRowCountPipeline(this.dataSource, this.creator, this.setter);
+    UpdateForUpdateCountPipeline pipeline = new UpdateForUpdateCountPipeline(this.dataSource, this.creator, this.setter);
+    pipeline.executeAndExpectUpdateCountTranslated(expected);
+  }
+
+  public long forLargeUpdateCount() {
+    UpdateForLargeUpdateCountPipeline pipeline = new UpdateForLargeUpdateCountPipeline(this.dataSource, this.creator, this.setter);
+    return pipeline.executeForUpdateCountTranslated();
+  }
+
+  public void expectLargeUpdateCount(long expected) {
+    UpdateForLargeUpdateCountPipeline pipeline = new UpdateForLargeUpdateCountPipeline(this.dataSource, this.creator, this.setter);
     pipeline.executeAndExpectUpdateCountTranslated(expected);
   }
 

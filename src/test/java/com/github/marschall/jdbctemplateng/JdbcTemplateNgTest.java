@@ -41,6 +41,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.github.marschall.jdbctemplateng.api.RowMapper;
@@ -221,14 +222,51 @@ class JdbcTemplateNgTest {
   }
 
   @Test
-  void testUpdate() {
+  void testExpectUpdateCount() {
     this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "id INTEGER PRIMARY KEY"
-            + ")");
+                            + "id INTEGER PRIMARY KEY"
+                            + ")");
     this.jdbcTemplate
       .update("INSERT INTO test_table(id) VALUES (?)")
       .binding(23)
       .expectUpdateCount(1);
+  }
+
+  @Test
+  void testUpdateCount() {
+    this.jdbcTemplate.execute("CREATE TABLE test_table ("
+                            + "id INTEGER PRIMARY KEY"
+                            + ")");
+    int updateCount = this.jdbcTemplate
+            .update("INSERT INTO test_table(id) VALUES (?)")
+            .binding(23)
+            .forUpdateCount();
+    assertEquals(1, updateCount);
+  }
+
+  @Test
+  @Disabled("not implemented in H2")
+  void testExpectLargeUpdateCount() {
+    this.jdbcTemplate.execute("CREATE TABLE test_table ("
+            + "id LONG PRIMARY KEY"
+            + ")");
+    this.jdbcTemplate
+    .update("INSERT INTO test_table(id) VALUES (?)")
+    .binding(23)
+    .expectLargeUpdateCount(1L);
+  }
+
+  @Test
+  @Disabled("not implemented in H2")
+  void testLargeUpdateCount() {
+    this.jdbcTemplate.execute("CREATE TABLE test_table ("
+            + "id LONG PRIMARY KEY"
+            + ")");
+    long updateCount = this.jdbcTemplate
+            .update("INSERT INTO test_table(id) VALUES (?)")
+            .binding(23L)
+            .forLargeUpdateCount();
+    assertEquals(1L, updateCount);
   }
 
   @Test

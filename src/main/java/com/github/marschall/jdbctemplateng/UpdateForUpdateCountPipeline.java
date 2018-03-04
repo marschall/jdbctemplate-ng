@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
-final class UpdateForRowCountPipeline {
+final class UpdateForUpdateCountPipeline {
 
   private final DataSource dataSource;
 
@@ -17,7 +17,7 @@ final class UpdateForRowCountPipeline {
 
   private final PreparedStatementSetter setter;
 
-  UpdateForRowCountPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
+  UpdateForUpdateCountPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
     this.dataSource = dataSource;
     this.creator = creator;
     this.setter = setter;
@@ -42,7 +42,7 @@ final class UpdateForRowCountPipeline {
     }
   }
 
-  int execute() throws SQLException {
+  private int execute() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          PreparedStatement preparedStatement = this.creator.createPreparedStatement(connection)) {
       this.setter.setValues(preparedStatement);

@@ -36,7 +36,7 @@ final class UpdateForGenratedKeyPipeline<T> {
     }
   }
 
-  T execute() throws SQLException {
+  private T execute() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          PreparedStatement preparedStatement = this.creator.createPreparedStatement(connection)) {
       this.setter.setValues(preparedStatement);

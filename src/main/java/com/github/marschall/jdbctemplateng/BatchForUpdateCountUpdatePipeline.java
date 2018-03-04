@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 
-final class BatchUpdatePipeline<T> {
+final class BatchForUpdateCountUpdatePipeline<T> {
 
   private final DataSource dataSource;
   private final PreparedStatementCreator creator;
@@ -18,7 +18,7 @@ final class BatchUpdatePipeline<T> {
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchUpdatePipeline(DataSource dataSource, PreparedStatementCreator creator, Collection<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  BatchForUpdateCountUpdatePipeline(DataSource dataSource, PreparedStatementCreator creator, Collection<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
     this.creator = creator;
     this.batchArguments = batchArguments;
@@ -34,7 +34,7 @@ final class BatchUpdatePipeline<T> {
     }
   }
 
-  int[][] execute() throws SQLException {
+  private int[][] execute() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          PreparedStatement preparedStatement = this.creator.createPreparedStatement(connection)) {
 
