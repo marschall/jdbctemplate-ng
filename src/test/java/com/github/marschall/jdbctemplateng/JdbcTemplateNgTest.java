@@ -1,6 +1,5 @@
 package com.github.marschall.jdbctemplateng;
 
-import static com.github.marschall.jdbctemplateng.MoreCollectors.toOptional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -233,15 +232,29 @@ class JdbcTemplateNgTest {
   }
 
   @Test
-  void testBatchUpdate() {
-    List<Object[]> batchArgs = Collections.emptyList();
-    int batchSize = 10;
-    Optional<Integer> integers = this.jdbcTemplate
-            .batchUpdate("INSERT INTO T(X) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
+  void testBatchUpdateFullBatch() {
+    this.jdbcTemplate.execute("CREATE TABLE test_table ("
+            + "test_value INTEGER"
+            + ")");
+    List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22});
+    int updateCount = this.jdbcTemplate
+            .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
             .binding(batchArgs)
-            .forObject(Integer.class)
-            .collect(toOptional());
-    assertNotNull(integers);
+            .forTotalUpdateCount();
+    assertEquals(2, updateCount);
+  }
+
+  @Test
+  void testBatchUpdateNotFullBatch() {
+    this.jdbcTemplate.execute("CREATE TABLE test_table ("
+            + "test_value INTEGER"
+            + ")");
+    List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22}, new Object[] {33});
+    int updateCount = this.jdbcTemplate
+            .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
+            .binding(batchArgs, 2)
+            .forTotalUpdateCount();
+    assertEquals(3, updateCount);
   }
 
   static final class SingleConnectionDataSource implements DataSource {

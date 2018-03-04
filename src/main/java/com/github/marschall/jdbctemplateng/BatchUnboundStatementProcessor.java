@@ -30,7 +30,7 @@ public final class BatchUnboundStatementProcessor extends UnboundStatementProces
     return binding(batchArgs, batchSize, (PreparedStatement preparedStatement, Object[] values) -> {
       for (int i = 0; i < values.length; i++) {
         Object value = values[i];
-        preparedStatement.setObject(i + i, value);
+        preparedStatement.setObject(i + 1, value);
       }
     });
   }
