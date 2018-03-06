@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
-public class BoundStatementProcessor {
+abstract class BoundStatementProcessor {
 
   final DataSource dataSource;
   final PreparedStatementCreator creator;

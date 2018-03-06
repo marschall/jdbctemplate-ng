@@ -288,11 +288,11 @@ class JdbcTemplateNgTest {
             + "test_value INTEGER"
             + ")");
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22}, new Object[] {33});
-    int updateCount = this.jdbcTemplate
+    int[][] updateCounts = this.jdbcTemplate
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
             .binding(batchArgs, 2)
-            .forTotalUpdateCount();
-    assertEquals(3, updateCount);
+            .forPerBatchUpdateCount();
+    assertArrayEquals(new int[][] {new int[] {1, 1}, new int[] {1}}, updateCounts);
   }
 
   static final class SingleConnectionDataSource implements DataSource {

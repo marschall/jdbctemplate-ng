@@ -1,15 +1,18 @@
+JdbcTemplateNg
+==============
 
 A new take on JdbcTemplate.
 
-This project has the following goals
+This project has the following goals:
 
 - support Optional
 - reduce the number of methods on JdbcOperations
 - support named parameters
 
-additional features
+additional features:
 - more control over return type by use of a collector
 - statement customizer allows to set fetch size without having to create a prepared statement creator
+- large update support
 
 non-goals
 
@@ -18,12 +21,12 @@ features not supported:
 - work around JDBC driver bugs
 - consider JDBC metadata
 - jdbc type support
-- support rownum in RowMapper
-- support stored procedures
+- rownum in RowMapper
+- stored procedures
 
 TODO
 ====
-- batch updates
+- batch updates generated keys
 - connection customizer for readonly
 - unprepared statement for statements without bind parameters
 
