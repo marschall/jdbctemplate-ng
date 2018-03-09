@@ -66,6 +66,11 @@ class JdbcTemplateNgTest {
               + "id IDENTITY PRIMARY KEY,"
               + "test_value INTEGER"
               + ")");
+      statement.execute("CREATE TABLE single_row_table ("
+              + "dummy VARCHAR(1) PRIMARY KEY"
+              + ")");
+      statement.execute("INSERT INTO single_row_table(dummy)"
+              + " VALUES ('X') ");
     }
   }
 
@@ -79,15 +84,10 @@ class JdbcTemplateNgTest {
     this.jdbcTemplate = new JdbcTemplateNg(dataSource);
   }
 
-//  @AfterEach
-//  void tearDown() {
-//    this.jdbcTemplate.execute("DROP TABLE test_table IF EXISTS");
-//  }
-
   @Test
   void testToList() {
     List<Integer> integers = this.jdbcTemplate
-      .query("SELECT 1 FROM dual WHERE ? > 1")
+      .query("SELECT 1 FROM single_row_table WHERE ? > 1")
       .binding(23)
       .mapTo(Integer.class)
       .collectToList();
@@ -175,7 +175,7 @@ class JdbcTemplateNgTest {
   @Test
   void testToOptionalPresent() {
     Optional<Integer> integer = this.jdbcTemplate
-            .query("SELECT 1 FROM dual WHERE ? > 1")
+            .query("SELECT 1 FROM single_row_table WHERE ? > 1")
             .binding(23)
             .mapTo(Integer.class)
             .collectToOptional();
@@ -197,7 +197,7 @@ class JdbcTemplateNgTest {
   void testToUniqueObjectNotPresent() {
     assertThrows(UncheckedSQLException.class, () -> {
       this.jdbcTemplate
-      .query("SELECT 1 FROM dual WHERE 2 < 1")
+      .query("SELECT 1 FROM single_row_table WHERE 2 < 1")
       .withoutBindParameters()
       .mapTo(Integer.class)
       .collectToUniqueObject();
@@ -207,7 +207,7 @@ class JdbcTemplateNgTest {
   @Test
   void testToOptionalNotPresent() {
     Optional<Integer> integer = this.jdbcTemplate
-            .query("SELECT 1 FROM dual WHERE ? > 1")
+            .query("SELECT 1 FROM single_row_table WHERE ? > 1")
             .binding(0)
             .mapTo(Integer.class)
             .collectToOptional();
