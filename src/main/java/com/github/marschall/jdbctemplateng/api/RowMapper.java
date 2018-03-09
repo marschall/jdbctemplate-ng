@@ -11,7 +11,6 @@ import java.util.Map;
 @FunctionalInterface
 public interface RowMapper<T> {
 
-  // REVIEW rowNum?
   T mapRow(ResultSet resultSet) throws SQLException;
 
   public static RowMapper<Map<String, Object>> toMap() {

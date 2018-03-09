@@ -38,7 +38,6 @@ import javax.sql.DataSource;
 
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -61,6 +60,13 @@ class JdbcTemplateNgTest {
     connection = h2dataSource.getConnection();
 
     dataSource = new SingleConnectionDataSource(connection, h2dataSource);
+
+    try (Statement statement = connection.createStatement()) {
+      statement.execute("CREATE TABLE test_table ("
+              + "id IDENTITY PRIMARY KEY,"
+              + "test_value INTEGER"
+              + ")");
+    }
   }
 
   @AfterAll
@@ -73,10 +79,10 @@ class JdbcTemplateNgTest {
     this.jdbcTemplate = new JdbcTemplateNg(dataSource);
   }
 
-  @AfterEach
-  void tearDown() {
-    this.jdbcTemplate.execute("DROP TABLE test_table IF EXISTS");
-  }
+//  @AfterEach
+//  void tearDown() {
+//    this.jdbcTemplate.execute("DROP TABLE test_table IF EXISTS");
+//  }
 
   @Test
   void testToList() {
@@ -103,16 +109,11 @@ class JdbcTemplateNgTest {
 
   @Test
   void queryForMap() {
-    List<Map<String, Object>> values = this.jdbcTemplate
+    Map<String, Object> row = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
             .map(RowMapper.toMap())
-            .collectToList();
-
-    assertNotNull(values);
-    assertThat(values).hasSize(1);
-
-    Map<String, Object> row = values.get(0);
+            .collectToUniqueObject();
 
     Set<String> expected = new HashSet<>(4);
     expected.add("1");
@@ -124,32 +125,39 @@ class JdbcTemplateNgTest {
   }
 
   @Test
+  @Disabled("unsure if we should support that")
+  void queryForMapCaseInsensitive() {
+    Map<String, Object> row = this.jdbcTemplate
+            .query("SELECT 1 as \"X\", 2 as \"x\" from dual")
+            .withoutBindParameters()
+            .map(RowMapper.toMap())
+            .collectToUniqueObject();
+
+    assertThat(row).hasSize(1);
+
+    assertEquals(Integer.valueOf(1), row.get("X"));
+    assertEquals(Integer.valueOf(1), row.get("x"));
+  }
+
+  @Test
   void queryForList() {
-    List<List<Object>> values = this.jdbcTemplate
+    List<Object> row = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
             .map(RowMapper.toList())
-            .collectToList();
+            .collectToUniqueObject();
 
-    assertNotNull(values);
-    assertThat(values).hasSize(1);
-
-    List<Object> row = values.get(0);
     assertEquals(Arrays.asList(1, "2"), row);
   }
 
   @Test
   void queryForArray() {
-    List<Object[]> values = this.jdbcTemplate
+    Object[] row = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
             .map(RowMapper.toArray())
-            .collectToList();
+            .collectToUniqueObject();
 
-    assertNotNull(values);
-    assertThat(values).hasSize(1);
-
-    Object[] row = values.get(0);
     assertArrayEquals(new Object[] {1, "2"}, row);
   }
 
@@ -209,34 +217,24 @@ class JdbcTemplateNgTest {
 
   @Test
   void testUpdateWithGeneratedKeys() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "id IDENTITY PRIMARY KEY,"
-            + "test_value INTEGER,"
-            + ")");
-    Long generatedKey =
+    Integer generatedKey =
             this.jdbcTemplate
             .update("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
             .binding(23)
-            .forGeneratedKey(Long.class);
-    assertEquals(Long.valueOf(1L), generatedKey);
+            .forGeneratedKey(Integer.class);
+    assertThat(generatedKey).isGreaterThan(0);
   }
 
   @Test
   void testExpectUpdateCount() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-                            + "id INTEGER PRIMARY KEY"
-                            + ")");
     this.jdbcTemplate
-      .update("INSERT INTO test_table(id) VALUES (?)")
-      .binding(23)
+      .update("INSERT INTO test_table(id, test_value) VALUES (?, ?)")
+      .binding(1000, 23)
       .expectUpdateCount(1);
   }
 
   @Test
   void testUpdateCount() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-                            + "id INTEGER PRIMARY KEY"
-                            + ")");
     int updateCount = this.jdbcTemplate
             .update("INSERT INTO test_table(id) VALUES (?)")
             .binding(23)
@@ -247,9 +245,6 @@ class JdbcTemplateNgTest {
   @Test
   @Disabled("not implemented in H2")
   void testExpectLargeUpdateCount() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "id LONG PRIMARY KEY"
-            + ")");
     this.jdbcTemplate
     .update("INSERT INTO test_table(id) VALUES (?)")
     .binding(23)
@@ -259,9 +254,6 @@ class JdbcTemplateNgTest {
   @Test
   @Disabled("not implemented in H2")
   void testLargeUpdateCount() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "id LONG PRIMARY KEY"
-            + ")");
     long updateCount = this.jdbcTemplate
             .update("INSERT INTO test_table(id) VALUES (?)")
             .binding(23L)
@@ -271,9 +263,6 @@ class JdbcTemplateNgTest {
 
   @Test
   void testBatchUpdateFullBatch() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "test_value INTEGER"
-            + ")");
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22});
     int updateCount = this.jdbcTemplate
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
@@ -284,9 +273,6 @@ class JdbcTemplateNgTest {
 
   @Test
   void testBatchUpdateNotFullBatch() {
-    this.jdbcTemplate.execute("CREATE TABLE test_table ("
-            + "test_value INTEGER"
-            + ")");
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22}, new Object[] {33});
     int[][] updateCounts = this.jdbcTemplate
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
