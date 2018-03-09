@@ -17,12 +17,12 @@ class H2JdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
 
   @BeforeAll
   static void setUpConnection() throws SQLException {
-    JdbcDataSource h2dataSource = new JdbcDataSource();
-    h2dataSource.setUrl("jdbc:h2:mem:");
+    JdbcDataSource h2DataSource = new JdbcDataSource();
+    h2DataSource.setUrl("jdbc:h2:mem:");
 
-    connection = h2dataSource.getConnection();
+    connection = h2DataSource.getConnection();
 
-    dataSource = new SingleConnectionDataSource(connection, h2dataSource);
+    dataSource = new SingleConnectionDataSource(connection, h2DataSource);
 
     try (Statement statement = connection.createStatement()) {
       statement.execute("CREATE TABLE test_table ("
