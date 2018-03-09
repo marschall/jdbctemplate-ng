@@ -33,5 +33,7 @@ TODO
 ???
 ===
 - should binding happen at the end so that operations can be cached? PreparedStatementSetter would have to take arguments
+- naming: query().collectTo...
+- naming: update().for...
 
 

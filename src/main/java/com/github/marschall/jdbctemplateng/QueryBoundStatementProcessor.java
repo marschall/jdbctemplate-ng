@@ -12,12 +12,12 @@ public final class QueryBoundStatementProcessor extends BoundStatementProcessor 
     super(dataSource, creator, setter);
   }
 
-  public <T> QueryRowProcessor<T> mapping(RowMapper<T> rowMapper) {
+  public <T> QueryRowProcessor<T> map(RowMapper<T> rowMapper) {
     return new QueryRowProcessor<>(this.dataSource, this.creator, this.setter, rowMapper);
   }
 
-  public <T> QueryRowProcessor<T> forObject(Class<T> requiredType) {
-    return this.mapping(resultSet -> resultSet.getObject(1, requiredType));
+  public <T> QueryRowProcessor<T> mapTo(Class<T> requiredType) {
+    return this.map(resultSet -> resultSet.getObject(1, requiredType));
   }
 
 }

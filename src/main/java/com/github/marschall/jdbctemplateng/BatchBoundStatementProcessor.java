@@ -2,11 +2,14 @@ package com.github.marschall.jdbctemplateng;
 
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+import com.github.marschall.jdbctemplateng.api.RowMapper;
 
 public final class BatchBoundStatementProcessor<T> {
 
@@ -32,7 +35,11 @@ public final class BatchBoundStatementProcessor<T> {
         if (rowUpdateCount == Statement.SUCCESS_NO_INFO) {
           return Statement.SUCCESS_NO_INFO;
         }
-        totalUpdateCount += rowUpdateCount;
+        try {
+          totalUpdateCount = Math.addExact(totalUpdateCount, rowUpdateCount);
+        } catch (ArithmeticException e) {
+          return Statement.SUCCESS_NO_INFO;
+        }
       }
     }
     return totalUpdateCount;
@@ -43,8 +50,12 @@ public final class BatchBoundStatementProcessor<T> {
     return pipeline.executeForPerBatchUpdateCountTranslated();
   }
 
-//  public <T> List<T> forGeneratedKeys(RowMapper<T> keyExtractor) {
-//
-//  }
+  public <K> List<FailedUpdate<T>> forFailedUpdates(RowMapper<T> keyExtractor, BiConsumer<K, T> callback) {
+    return null;
+  }
+
+  public <K> List<K> forGeneratedKeys(RowMapper<K> keyExtractor) {
+    return null;
+  }
 
 }

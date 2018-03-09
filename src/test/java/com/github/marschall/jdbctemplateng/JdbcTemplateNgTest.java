@@ -83,8 +83,8 @@ class JdbcTemplateNgTest {
     List<Integer> integers = this.jdbcTemplate
       .query("SELECT 1 FROM dual WHERE ? > 1")
       .binding(23)
-      .forObject(Integer.class)
-      .toList();
+      .mapTo(Integer.class)
+      .collectToList();
     assertNotNull(integers);
     assertEquals(Collections.singletonList(1), integers);
   }
@@ -95,8 +95,8 @@ class JdbcTemplateNgTest {
             .query("SELECT 1 FROM dual")
             .fetchSize(1)
             .withoutBindParameters()
-            .forObject(Integer.class)
-            .toList();
+            .mapTo(Integer.class)
+            .collectToList();
     assertNotNull(integers);
     assertEquals(Collections.singletonList(1), integers);
   }
@@ -106,8 +106,8 @@ class JdbcTemplateNgTest {
     List<Map<String, Object>> values = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
-            .mapping(RowMapper.toMap())
-            .toList();
+            .map(RowMapper.toMap())
+            .collectToList();
 
     assertNotNull(values);
     assertThat(values).hasSize(1);
@@ -128,8 +128,8 @@ class JdbcTemplateNgTest {
     List<List<Object>> values = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
-            .mapping(RowMapper.toList())
-            .toList();
+            .map(RowMapper.toList())
+            .collectToList();
 
     assertNotNull(values);
     assertThat(values).hasSize(1);
@@ -143,8 +143,8 @@ class JdbcTemplateNgTest {
     List<Object[]> values = this.jdbcTemplate
             .query("SELECT 1, '2' as TWO FROM dual")
             .withoutBindParameters()
-            .mapping(RowMapper.toArray())
-            .toList();
+            .map(RowMapper.toArray())
+            .collectToList();
 
     assertNotNull(values);
     assertThat(values).hasSize(1);
@@ -158,8 +158,8 @@ class JdbcTemplateNgTest {
     Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual")
             .withoutBindParameters()
-            .forObject(Integer.class)
-            .toOptional();
+            .mapTo(Integer.class)
+            .collectToOptional();
     assertNotNull(integer);
     assertEquals(Optional.of(1), integer);
   }
@@ -169,8 +169,8 @@ class JdbcTemplateNgTest {
     Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(23)
-            .forObject(Integer.class)
-            .toOptional();
+            .mapTo(Integer.class)
+            .collectToOptional();
     assertNotNull(integer);
     assertEquals(Optional.of(1), integer);
   }
@@ -180,8 +180,8 @@ class JdbcTemplateNgTest {
     Integer integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual")
             .withoutBindParameters()
-            .forObject(Integer.class)
-            .toUniqueObject();
+            .mapTo(Integer.class)
+            .collectToUniqueObject();
     assertEquals(Integer.valueOf(1), integer);
   }
 
@@ -191,8 +191,8 @@ class JdbcTemplateNgTest {
       this.jdbcTemplate
       .query("SELECT 1 FROM dual WHERE 2 < 1")
       .withoutBindParameters()
-      .forObject(Integer.class)
-      .toUniqueObject();
+      .mapTo(Integer.class)
+      .collectToUniqueObject();
     });
   }
 
@@ -201,8 +201,8 @@ class JdbcTemplateNgTest {
     Optional<Integer> integer = this.jdbcTemplate
             .query("SELECT 1 FROM dual WHERE ? > 1")
             .binding(0)
-            .forObject(Integer.class)
-            .toOptional();
+            .mapTo(Integer.class)
+            .collectToOptional();
     assertNotNull(integer);
     assertEquals(Optional.empty(), integer);
   }

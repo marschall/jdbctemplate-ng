@@ -30,18 +30,18 @@ public final class QueryRowProcessor<T> {
     return pipeline.executeTranslated();
   }
 
-  public List<T> toList() {
+  public List<T> collectToList() {
     // TODO should probably be optimized
     return this.collect(Collectors.toList());
   }
 
-  public Optional<T> toOptional() {
+  public Optional<T> collectToOptional() {
     return this.collect(MoreCollectors.toOptional());
   }
 
-  public T toUniqueObject() {
+  public T collectToUniqueObject() {
     // TODO should probably be optimized
-    return this.toOptional().orElseThrow(() -> {
+    return this.collectToOptional().orElseThrow(() -> {
       // TODO better exception
       return UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 0, null);
     });

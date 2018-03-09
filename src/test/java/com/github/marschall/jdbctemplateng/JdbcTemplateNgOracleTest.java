@@ -23,8 +23,8 @@ class JdbcTemplateNgOracleTest {
     Integer integer = this.jdbcTemplate
             .query("SELECT :x FROM dual")
             .binding("x", 1)
-            .forObject(Integer.class)
-            .toUniqueObject();
+            .mapTo(Integer.class)
+            .collectToUniqueObject();
     assertEquals(Integer.valueOf(1), integer);
   }
 
