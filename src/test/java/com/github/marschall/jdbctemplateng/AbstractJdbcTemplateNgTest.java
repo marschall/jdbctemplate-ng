@@ -25,63 +25,30 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.github.marschall.jdbctemplateng.api.RowMapper;
 
-class JdbcTemplateNgTest {
-
-  private static DataSource dataSource;
-  private static Connection connection;
+abstract class AbstractJdbcTemplateNgTest {
 
   private JdbcTemplateNg jdbcTemplate;
 
-  @BeforeAll
-  static void setUpConnection() throws SQLException {
-    JdbcDataSource h2dataSource = new JdbcDataSource();
-    h2dataSource.setUrl("jdbc:h2:mem:");
-
-    connection = h2dataSource.getConnection();
-
-    dataSource = new SingleConnectionDataSource(connection, h2dataSource);
-
-    try (Statement statement = connection.createStatement()) {
-      statement.execute("CREATE TABLE test_table ("
-              + "id IDENTITY PRIMARY KEY,"
-              + "test_value INTEGER"
-              + ")");
-      statement.execute("CREATE TABLE single_row_table ("
-              + "dummy VARCHAR(1) PRIMARY KEY"
-              + ")");
-      statement.execute("INSERT INTO single_row_table(dummy)"
-              + " VALUES ('X') ");
-    }
-  }
-
-  @AfterAll
-  static void tearDownConnection() throws SQLException {
-    connection.close();
-  }
+   abstract DataSource getDataSource();
 
   @BeforeEach
   void setUp() {
-    this.jdbcTemplate = new JdbcTemplateNg(dataSource);
+    this.jdbcTemplate = new JdbcTemplateNg(getDataSource());
   }
 
   @Test
@@ -98,7 +65,7 @@ class JdbcTemplateNgTest {
   @Test
   void customizeStatement() {
     List<Integer> integers = this.jdbcTemplate
-            .query("SELECT 1 FROM dual")
+            .query("SELECT 1 FROM single_row_table")
             .fetchSize(1)
             .withoutBindParameters()
             .mapTo(Integer.class)
@@ -110,17 +77,13 @@ class JdbcTemplateNgTest {
   @Test
   void queryForMap() {
     Map<String, Object> row = this.jdbcTemplate
-            .query("SELECT 1, '2' as TWO FROM dual")
+            .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toMap())
             .collectToUniqueObject();
 
-    Set<String> expected = new HashSet<>(4);
-    expected.add("1");
-    expected.add("TWO");
-    assertEquals(expected, row.keySet());
+    assertThat(row).hasSize(2);
 
-    assertEquals(Integer.valueOf(1), row.get("1"));
     assertEquals("2", row.get("TWO"));
   }
 
@@ -128,7 +91,7 @@ class JdbcTemplateNgTest {
   @Disabled("unsure if we should support that")
   void queryForMapCaseInsensitive() {
     Map<String, Object> row = this.jdbcTemplate
-            .query("SELECT 1 as \"X\", 2 as \"x\" from dual")
+            .query("SELECT 1 as \"X\", 2 as \"x\" from single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toMap())
             .collectToUniqueObject();
@@ -142,7 +105,7 @@ class JdbcTemplateNgTest {
   @Test
   void queryForList() {
     List<Object> row = this.jdbcTemplate
-            .query("SELECT 1, '2' as TWO FROM dual")
+            .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toList())
             .collectToUniqueObject();
@@ -153,7 +116,7 @@ class JdbcTemplateNgTest {
   @Test
   void queryForArray() {
     Object[] row = this.jdbcTemplate
-            .query("SELECT 1, '2' as TWO FROM dual")
+            .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toArray())
             .collectToUniqueObject();
@@ -164,7 +127,7 @@ class JdbcTemplateNgTest {
   @Test
   void withoutBindVariables() {
     Optional<Integer> integer = this.jdbcTemplate
-            .query("SELECT 1 FROM dual")
+            .query("SELECT 1 FROM single_row_table")
             .withoutBindParameters()
             .mapTo(Integer.class)
             .collectToOptional();
@@ -186,7 +149,7 @@ class JdbcTemplateNgTest {
   @Test
   void testToUniqueObjectPresent() {
     Integer integer = this.jdbcTemplate
-            .query("SELECT 1 FROM dual")
+            .query("SELECT 1 FROM single_row_table")
             .withoutBindParameters()
             .mapTo(Integer.class)
             .collectToUniqueObject();
