@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.PrintWriter;
 import java.sql.Array;
@@ -49,6 +50,14 @@ abstract class AbstractJdbcTemplateNgTest {
   @BeforeEach
   void setUp() {
     this.jdbcTemplate = new JdbcTemplateNg(getDataSource());
+  }
+
+  boolean largeUpdateSupported() {
+    return true;
+  }
+
+  void assumeLargeUpdateSupported() {
+    assumeTrue(this.largeUpdateSupported());
   }
 
   @Test
@@ -206,20 +215,20 @@ abstract class AbstractJdbcTemplateNgTest {
   }
 
   @Test
-  @Disabled("not implemented in H2")
   void testExpectLargeUpdateCount() {
+    assumeLargeUpdateSupported();
     this.jdbcTemplate
-    .update("INSERT INTO test_table(id) VALUES (?)")
-    .binding(23)
-    .expectLargeUpdateCount(1L);
+      .update("INSERT INTO test_table(id) VALUES (?)")
+      .binding(10000L)
+      .expectLargeUpdateCount(1L);
   }
 
   @Test
-  @Disabled("not implemented in H2")
   void testLargeUpdateCount() {
+    assumeLargeUpdateSupported();
     long updateCount = this.jdbcTemplate
             .update("INSERT INTO test_table(id) VALUES (?)")
-            .binding(23L)
+            .binding(10001L)
             .forLargeUpdateCount();
     assertEquals(1L, updateCount);
   }

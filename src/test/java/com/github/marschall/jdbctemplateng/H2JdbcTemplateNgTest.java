@@ -42,8 +42,14 @@ class H2JdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
     connection.close();
   }
 
+  @Override
   DataSource getDataSource() {
    return dataSource;
  }
+
+  @Override
+  boolean largeUpdateSupported() {
+    return false;
+  }
 
 }

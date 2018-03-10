@@ -48,6 +48,7 @@ public class DerbyJdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
     connection.close();
   }
 
+  @Override
   DataSource getDataSource() {
    return dataSource;
  }
