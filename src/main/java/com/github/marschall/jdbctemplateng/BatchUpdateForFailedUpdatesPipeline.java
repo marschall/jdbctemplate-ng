@@ -3,22 +3,24 @@ package com.github.marschall.jdbctemplateng;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 
-final class BatchForUpdateCountUpdatePipeline<T> {
+final class BatchUpdateForFailedUpdatesPipeline<T> {
 
   private final DataSource dataSource;
   private final PreparedStatementCreator creator;
-  private final Collection<T> batchArguments;
+  private final List<T> batchArguments;
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchForUpdateCountUpdatePipeline(DataSource dataSource, PreparedStatementCreator creator, Collection<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  BatchUpdateForFailedUpdatesPipeline(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
+          ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
     this.creator = creator;
     this.batchArguments = batchArguments;
@@ -26,7 +28,7 @@ final class BatchForUpdateCountUpdatePipeline<T> {
     this.setter = setter;
   }
 
-  int[][] executeForPerBatchUpdateCountTranslated() {
+  List<FailedUpdate<T>> forFailedUpdates() {
     try {
       return this.execute();
     } catch (SQLException e) {
@@ -34,7 +36,7 @@ final class BatchForUpdateCountUpdatePipeline<T> {
     }
   }
 
-  private int[][] execute() throws SQLException {
+  private List<FailedUpdate<T>> execute() throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          PreparedStatement preparedStatement = this.creator.createPreparedStatement(connection)) {
 
@@ -42,11 +44,7 @@ final class BatchForUpdateCountUpdatePipeline<T> {
       int indexInBatch = 0;
       int batchIndex = 0;
       int elementCount = this.batchArguments.size();
-      int batchCount = elementCount / batchSize;
-      if (elementCount % batchSize != 0) {
-        batchCount += 1;
-      }
-      int[][] totalBatchUpdateCount = new int[batchCount][];
+      List<FailedUpdate<T>> failedUpdates = new ArrayList<>(1);
 
       for (T element : this.batchArguments) {
         this.setter.setValues(preparedStatement, element);
@@ -54,7 +52,15 @@ final class BatchForUpdateCountUpdatePipeline<T> {
 
         if (indexInBatch == this.batchSize - 1 || rowIndex == elementCount - 1) {
           int[] batchUpdateCount = preparedStatement.executeBatch();
-          totalBatchUpdateCount[batchIndex] = batchUpdateCount;
+
+          for (int i = 0; i < batchUpdateCount.length; i++) {
+            int updateCount = batchUpdateCount[i];
+
+            if (updateCount != 1) {
+              T updatedElement = this.batchArguments.get(batchIndex * this.batchSize + i);
+              failedUpdates.add(new FailedUpdate<>(updateCount, updatedElement));
+            }
+          }
           batchIndex += 1;
           indexInBatch = 0;
         } else {
@@ -63,7 +69,7 @@ final class BatchForUpdateCountUpdatePipeline<T> {
         rowIndex += 1;
       }
 
-      return totalBatchUpdateCount;
+      return failedUpdates;
     }
   }
 

@@ -273,6 +273,17 @@ abstract class AbstractJdbcTemplateNgTest {
     assertNotNull(dto2.getPrimaryKey());
   }
 
+  @Test
+  void testForFailedUpdates() {
+    List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22});
+    List<FailedUpdate<Object[]>> failedUpdates = this.jdbcTemplate
+            .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
+            .binding(batchArgs)
+            .forFailedUpdates();
+
+    assertThat(failedUpdates).isEmpty();;
+  }
+
   static final class SimpleDTO {
 
     private Integer primaryKey;

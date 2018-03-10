@@ -15,7 +15,7 @@ import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSet
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
 
-final class BatchForFailedUpdatesAndGeneratedKeysUpdatePipeline<T, K> {
+final class BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> {
 
   private final DataSource dataSource;
   private final PreparedStatementCreator creator;
@@ -25,7 +25,7 @@ final class BatchForFailedUpdatesAndGeneratedKeysUpdatePipeline<T, K> {
   private final RowMapper<K> keyExtractor;
   private final BiConsumer<T, K> callback;
 
-  BatchForFailedUpdatesAndGeneratedKeysUpdatePipeline(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
+  BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
           ParameterizedPreparedStatementSetter<T> setter, RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
     this.dataSource = dataSource;
     this.creator = creator;

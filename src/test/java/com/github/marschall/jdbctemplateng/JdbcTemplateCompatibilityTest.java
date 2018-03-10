@@ -31,7 +31,7 @@ class JdbcTemplateCompatibilityTest {
   @Autowired
   private JdbcOperations jdbcOperations;
 
-  @Test
+  @Test // SPR-16578
   void caseInsensitiveKeys() {
     Map<String, Object> map = this.jdbcOperations.queryForMap("SELECT 1 as \"X\", 2 as \"x\" from dual");
 

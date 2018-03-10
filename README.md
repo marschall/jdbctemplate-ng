@@ -26,7 +26,7 @@ features not supported:
 
 TODO
 ====
-- batch updates generated keys
+- tests for failed updates
 - unprepared statement for statements without bind parameters
 
 ???
