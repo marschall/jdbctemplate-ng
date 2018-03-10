@@ -60,6 +60,10 @@ abstract class AbstractJdbcTemplateNgTest {
     assumeTrue(this.largeUpdateSupported());
   }
 
+  JdbcTemplateNg getJdbcTemplate() {
+    return this.jdbcTemplate;
+  }
+
   @Test
   void testToList() {
     List<Integer> integers = this.jdbcTemplate
@@ -251,6 +255,46 @@ abstract class AbstractJdbcTemplateNgTest {
             .binding(batchArgs, 2)
             .forPerBatchUpdateCount();
     assertArrayEquals(new int[][] {new int[] {1, 1}, new int[] {1}}, updateCounts);
+  }
+
+  @Test
+  void testBatchUpdateGeneratedKey() {
+    SimpleDTO dto1 = new SimpleDTO(23);
+    SimpleDTO dto2 = new SimpleDTO(42);
+
+    List<SimpleDTO> dtos = Arrays.asList(dto1, dto2);
+    List<FailedUpdate<SimpleDTO>> failedUpdates = this.jdbcTemplate
+            .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
+            .binding(dtos, 10, (preparedStatement, dto) -> preparedStatement.setInt(1, dto.getTestValue()))
+            .forFailedUpdates(Integer.class, SimpleDTO::setPrimaryKey);
+
+    assertThat(failedUpdates).isEmpty();;
+    assertNotNull(dto1.getPrimaryKey());
+    assertNotNull(dto2.getPrimaryKey());
+  }
+
+  static final class SimpleDTO {
+
+    private Integer primaryKey;
+
+    private final int testValue;
+
+    SimpleDTO(int testValue) {
+      this.testValue = testValue;
+    }
+
+    Integer getPrimaryKey() {
+      return this.primaryKey;
+    }
+
+    void setPrimaryKey(Integer primaryKey) {
+      this.primaryKey = primaryKey;
+    }
+
+    int getTestValue() {
+      return this.testValue;
+    }
+
   }
 
   static final class SingleConnectionDataSource implements DataSource {

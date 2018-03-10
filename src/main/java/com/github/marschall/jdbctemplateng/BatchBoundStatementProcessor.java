@@ -1,7 +1,6 @@
 package com.github.marschall.jdbctemplateng;
 
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -15,11 +14,11 @@ public final class BatchBoundStatementProcessor<T> {
 
   private final DataSource dataSource;
   private final PreparedStatementCreator creator;
-  private final Collection<T> batchArgs;
+  private final List<T> batchArgs;
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchBoundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, Collection<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  BatchBoundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
     this.creator = creator;
     this.batchArgs = batchArgs;
@@ -46,12 +45,19 @@ public final class BatchBoundStatementProcessor<T> {
   }
 
   public int[][] forPerBatchUpdateCount() {
-    BatchForUpdateCountUpdatePipeline<T> pipeline = new BatchForUpdateCountUpdatePipeline<T>(this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
+    BatchForUpdateCountUpdatePipeline<T> pipeline = new BatchForUpdateCountUpdatePipeline<>(
+            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
     return pipeline.executeForPerBatchUpdateCountTranslated();
   }
 
-  public <K> List<FailedUpdate<T>> forFailedUpdates(RowMapper<T> keyExtractor, BiConsumer<K, T> callback) {
-    return null;
+  public <K> List<FailedUpdate<T>> forFailedUpdates(Class<K> keyType, BiConsumer<T, K> callback) {
+    return forFailedUpdates(resultSet -> resultSet.getObject(1, keyType), callback);
+  }
+
+  public <K> List<FailedUpdate<T>> forFailedUpdates(RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
+    BatchForFailedUpdatesAndGeneratedKeysUpdatePipeline<T, K> pipeline = new BatchForFailedUpdatesAndGeneratedKeysUpdatePipeline<>(
+            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter, keyExtractor, callback);
+    return pipeline.forFailedUpdatesAndGeneratedKeys();
   }
 
   public <K> List<K> forGeneratedKeys(RowMapper<K> keyExtractor) {

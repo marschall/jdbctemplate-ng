@@ -46,15 +46,15 @@ final class BatchForUpdateCountUpdatePipeline<T> {
       if (elementCount % batchSize != 0) {
         batchCount += 1;
       }
-      int[][] perBatchUpdateCount = new int[batchCount][];
+      int[][] totalBatchUpdateCount = new int[batchCount][];
 
       for (T element : this.batchArguments) {
         this.setter.setValues(preparedStatement, element);
         preparedStatement.addBatch();
 
         if (indexInBatch == this.batchSize - 1 || rowIndex == elementCount - 1) {
-          int[] updateCount = preparedStatement.executeBatch();
-          perBatchUpdateCount[batchIndex] = updateCount;
+          int[] batchUpdateCount = preparedStatement.executeBatch();
+          totalBatchUpdateCount[batchIndex] = batchUpdateCount;
           batchIndex += 1;
           indexInBatch = 0;
         } else {
@@ -63,7 +63,7 @@ final class BatchForUpdateCountUpdatePipeline<T> {
         rowIndex += 1;
       }
 
-      return perBatchUpdateCount;
+      return totalBatchUpdateCount;
     }
   }
 

@@ -31,9 +31,13 @@ TODO
 
 ???
 ===
-- should binding happen at the end so that operations can be cached? PreparedStatementSetter would have to take arguments
 - naming: query().collectTo...
 - naming: update().for...
+- naming: batchUpdate().forFailedUpdates is bad, something with generated keys and callback
+- naming: JdbcTemplate.(batch)UpdateForGeneratedKeys()
+- should #binding support a collection as an argument, especially for batch updates
+
 - case insensitive map, map contract, keySet, equals contract
+- should binding happen at the end so that operations can be cached? PreparedStatementSetter would have to take arguments
 
 

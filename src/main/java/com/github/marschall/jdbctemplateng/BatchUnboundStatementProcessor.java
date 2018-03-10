@@ -1,7 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import javax.sql.DataSource;
@@ -22,11 +22,11 @@ public final class BatchUnboundStatementProcessor extends UnboundStatementProces
     return new BatchUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer), this.namedFactory);
   }
 
-  public BatchBoundStatementProcessor<Object[]> binding(Collection<Object[]> batchArgs) {
+  public BatchBoundStatementProcessor<Object[]> binding(List<Object[]> batchArgs) {
     return binding(batchArgs, batchArgs.size());
   }
 
-  public BatchBoundStatementProcessor<Object[]> binding(Collection<Object[]> batchArgs, int batchSize) {
+  public BatchBoundStatementProcessor<Object[]> binding(List<Object[]> batchArgs, int batchSize) {
     return binding(batchArgs, batchSize, (PreparedStatement preparedStatement, Object[] values) -> {
       for (int i = 0; i < values.length; i++) {
         Object value = values[i];
@@ -35,7 +35,7 @@ public final class BatchUnboundStatementProcessor extends UnboundStatementProces
     });
   }
 
-  public <T> BatchBoundStatementProcessor<T> binding(Collection<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  public <T> BatchBoundStatementProcessor<T> binding(List<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     Objects.requireNonNull(batchArgs, "batchArgs");
     if (batchSize <= 0) {
       throw new IllegalArgumentException("batch size must be positive");
