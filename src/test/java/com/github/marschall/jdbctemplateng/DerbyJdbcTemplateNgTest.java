@@ -18,9 +18,8 @@ public class DerbyJdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
   @BeforeAll
   static void setUpConnection() throws SQLException {
     EmbeddedDataSource derbyDataSource = new EmbeddedDataSource();
-    derbyDataSource.setDatabaseName("marschall");
+    derbyDataSource.setDatabaseName("memory:marschall");
     derbyDataSource.setCreateDatabase("create");
-//    h2dataSource.setUrl("jdbc:derby:");
 
     connection = derbyDataSource.getConnection();
 
