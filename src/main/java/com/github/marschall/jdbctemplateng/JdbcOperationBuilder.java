@@ -13,20 +13,20 @@ import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFacto
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 
-public final class JdbcTemplateNg {
+public final class JdbcOperationBuilder {
 
   private final DataSource dataSource;
 
   private final NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory;
 
-  public JdbcTemplateNg(DataSource dataSource, NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory) {
+  public JdbcOperationBuilder(DataSource dataSource, NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory) {
     Objects.requireNonNull(dataSource, "dataSource");
     Objects.requireNonNull(namedPreparedStatementSetterFactory, "namedPreparedStatementSetterFactory");
     this.dataSource = dataSource;
     this.namedPreparedStatementSetterFactory = namedPreparedStatementSetterFactory;
   }
 
-  public JdbcTemplateNg(DataSource dataSource) {
+  public JdbcOperationBuilder(DataSource dataSource) {
     this(dataSource, UnsupportedNamedPreparedStatementSetterFactory.INSTANCE);
   }
 

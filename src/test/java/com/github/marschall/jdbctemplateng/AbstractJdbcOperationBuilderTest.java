@@ -41,15 +41,15 @@ import org.junit.jupiter.api.Test;
 
 import com.github.marschall.jdbctemplateng.api.RowMapper;
 
-abstract class AbstractJdbcTemplateNgTest {
+abstract class AbstractJdbcOperationBuilderTest {
 
-  private JdbcTemplateNg jdbcTemplate;
+  private JdbcOperationBuilder builder;
 
    abstract DataSource getDataSource();
 
   @BeforeEach
   void setUp() {
-    this.jdbcTemplate = new JdbcTemplateNg(getDataSource());
+    this.builder = new JdbcOperationBuilder(getDataSource());
   }
 
   boolean largeUpdateSupported() {
@@ -60,13 +60,13 @@ abstract class AbstractJdbcTemplateNgTest {
     assumeTrue(this.largeUpdateSupported());
   }
 
-  JdbcTemplateNg getJdbcTemplate() {
-    return this.jdbcTemplate;
+  JdbcOperationBuilder getBuilder() {
+    return this.builder;
   }
 
   @Test
   void testToList() {
-    List<Integer> integers = this.jdbcTemplate
+    List<Integer> integers = this.builder
       .query("SELECT 1 FROM single_row_table WHERE ? > 1")
       .binding(23)
       .mapTo(Integer.class)
@@ -77,7 +77,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void customizeStatement() {
-    List<Integer> integers = this.jdbcTemplate
+    List<Integer> integers = this.builder
             .query("SELECT 1 FROM single_row_table")
             .fetchSize(1)
             .withoutBindParameters()
@@ -89,7 +89,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void queryForMap() {
-    Map<String, Object> row = this.jdbcTemplate
+    Map<String, Object> row = this.builder
             .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toMap())
@@ -103,7 +103,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   @Disabled("unsure if we should support that")
   void queryForMapCaseInsensitive() {
-    Map<String, Object> row = this.jdbcTemplate
+    Map<String, Object> row = this.builder
             .query("SELECT 1 as \"X\", 2 as \"x\" from single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toMap())
@@ -117,7 +117,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void queryForList() {
-    List<Object> row = this.jdbcTemplate
+    List<Object> row = this.builder
             .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toList())
@@ -128,7 +128,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void queryForArray() {
-    Object[] row = this.jdbcTemplate
+    Object[] row = this.builder
             .query("SELECT 1, '2' as TWO FROM single_row_table")
             .withoutBindParameters()
             .map(RowMapper.toArray())
@@ -139,7 +139,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void withoutBindVariables() {
-    Optional<Integer> integer = this.jdbcTemplate
+    Optional<Integer> integer = this.builder
             .query("SELECT 1 FROM single_row_table")
             .withoutBindParameters()
             .mapTo(Integer.class)
@@ -150,7 +150,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void testToOptionalPresent() {
-    Optional<Integer> integer = this.jdbcTemplate
+    Optional<Integer> integer = this.builder
             .query("SELECT 1 FROM single_row_table WHERE ? > 1")
             .binding(23)
             .mapTo(Integer.class)
@@ -161,7 +161,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void testToUniqueObjectPresent() {
-    Integer integer = this.jdbcTemplate
+    Integer integer = this.builder
             .query("SELECT 1 FROM single_row_table")
             .withoutBindParameters()
             .mapTo(Integer.class)
@@ -172,7 +172,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testToUniqueObjectNotPresent() {
     assertThrows(UncheckedSQLException.class, () -> {
-      this.jdbcTemplate
+      this.builder
       .query("SELECT 1 FROM single_row_table WHERE 2 < 1")
       .withoutBindParameters()
       .mapTo(Integer.class)
@@ -182,7 +182,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void testToOptionalNotPresent() {
-    Optional<Integer> integer = this.jdbcTemplate
+    Optional<Integer> integer = this.builder
             .query("SELECT 1 FROM single_row_table WHERE ? > 1")
             .binding(0)
             .mapTo(Integer.class)
@@ -194,7 +194,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testUpdateWithGeneratedKeys() {
     Integer generatedKey =
-            this.jdbcTemplate
+            this.builder
             .update("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
             .binding(23)
             .forGeneratedKey(Integer.class);
@@ -203,7 +203,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void testExpectUpdateCount() {
-    this.jdbcTemplate
+    this.builder
       .update("INSERT INTO test_table(id, test_value) VALUES (?, ?)")
       .binding(1000, 23)
       .expectUpdateCount(1);
@@ -211,7 +211,7 @@ abstract class AbstractJdbcTemplateNgTest {
 
   @Test
   void testUpdateCount() {
-    int updateCount = this.jdbcTemplate
+    int updateCount = this.builder
             .update("INSERT INTO test_table(id) VALUES (?)")
             .binding(23)
             .forUpdateCount();
@@ -221,7 +221,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testExpectLargeUpdateCount() {
     assumeLargeUpdateSupported();
-    this.jdbcTemplate
+    this.builder
       .update("INSERT INTO test_table(id) VALUES (?)")
       .binding(10000L)
       .expectLargeUpdateCount(1L);
@@ -230,7 +230,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testLargeUpdateCount() {
     assumeLargeUpdateSupported();
-    long updateCount = this.jdbcTemplate
+    long updateCount = this.builder
             .update("INSERT INTO test_table(id) VALUES (?)")
             .binding(10001L)
             .forLargeUpdateCount();
@@ -240,7 +240,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testBatchUpdateFullBatch() {
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22});
-    int updateCount = this.jdbcTemplate
+    int updateCount = this.builder
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
             .binding(batchArgs)
             .forTotalUpdateCount();
@@ -250,7 +250,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testBatchUpdateNotFullBatch() {
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22}, new Object[] {33});
-    int[][] updateCounts = this.jdbcTemplate
+    int[][] updateCounts = this.builder
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
             .binding(batchArgs, 2)
             .forPerBatchUpdateCount();
@@ -263,7 +263,7 @@ abstract class AbstractJdbcTemplateNgTest {
     SimpleDTO dto2 = new SimpleDTO(42);
 
     List<SimpleDTO> dtos = Arrays.asList(dto1, dto2);
-    List<FailedUpdate<SimpleDTO>> failedUpdates = this.jdbcTemplate
+    List<FailedUpdate<SimpleDTO>> failedUpdates = this.builder
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
             .binding(dtos, 10, (preparedStatement, dto) -> preparedStatement.setInt(1, dto.getTestValue()))
             .forFailedUpdates(Integer.class, SimpleDTO::setPrimaryKey);
@@ -276,7 +276,7 @@ abstract class AbstractJdbcTemplateNgTest {
   @Test
   void testForFailedUpdates() {
     List<Object[]> batchArgs = Arrays.asList(new Object[] {11}, new Object[] {22});
-    List<FailedUpdate<Object[]>> failedUpdates = this.jdbcTemplate
+    List<FailedUpdate<Object[]>> failedUpdates = this.builder
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)")
             .binding(batchArgs)
             .forFailedUpdates();

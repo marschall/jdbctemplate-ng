@@ -6,23 +6,23 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.h2.jdbcx.JdbcDataSource;
+import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-class H2JdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
+public class HsqlJdbcOperationBuilderTest extends AbstractJdbcOperationBuilderTest {
 
   private static DataSource dataSource;
   private static Connection connection;
 
   @BeforeAll
   static void setUpConnection() throws SQLException {
-    JdbcDataSource h2DataSource = new JdbcDataSource();
-    h2DataSource.setUrl("jdbc:h2:mem:");
+    JDBCDataSource hsqlDataSource = new JDBCDataSource();
+    hsqlDataSource.setUrl("jdbc:hsqldb:mem:marschall");
 
-    connection = h2DataSource.getConnection();
+    connection = hsqlDataSource.getConnection();
 
-    dataSource = new SingleConnectionDataSource(connection, h2DataSource);
+    dataSource = new SingleConnectionDataSource(connection, hsqlDataSource);
 
     try (Statement statement = connection.createStatement()) {
       statement.execute("CREATE TABLE test_table ("
@@ -46,10 +46,5 @@ class H2JdbcTemplateNgTest extends AbstractJdbcTemplateNgTest {
   DataSource getDataSource() {
    return dataSource;
  }
-
-  @Override
-  boolean largeUpdateSupported() {
-    return false;
-  }
 
 }

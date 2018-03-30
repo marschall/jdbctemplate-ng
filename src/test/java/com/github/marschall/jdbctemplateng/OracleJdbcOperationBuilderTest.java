@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFactory;
 
 @Disabled
-class JdbcTemplateNgOracleTest {
+class OracleJdbcOperationBuilderTest {
 
-  private JdbcTemplateNg jdbcTemplate;
+  private JdbcOperationBuilder jdbcTemplate;
 
   @BeforeEach
   void setUp() {
-    this.jdbcTemplate = new JdbcTemplateNg(null, NamedPreparedStatementSetterFactory.oracle());
+    this.jdbcTemplate = new JdbcOperationBuilder(null, NamedPreparedStatementSetterFactory.oracle());
   }
 
   @Test
