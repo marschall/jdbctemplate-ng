@@ -33,7 +33,7 @@ TODO
 ===
 - naming: query().collectTo...
 - naming: update().for...
-- naming: batchUpdate().forFailedUpdates is bad, something with generated keys and callback
+- naming: batchUpdate().forGeneratedKeysAndFailedUpdates is bad, something with generated keys and callback
 - naming: JdbcTemplate.(batch)UpdateForGeneratedKeys()
 - should #binding support a collection as an argument, especially for batch updates
 

@@ -266,7 +266,7 @@ abstract class AbstractJdbcOperationBuilderTest {
     List<FailedUpdate<SimpleDTO>> failedUpdates = this.builder
             .batchUpdate("INSERT INTO test_table(test_value) VALUES (?)", Statement.RETURN_GENERATED_KEYS)
             .binding(dtos, 10, (preparedStatement, dto) -> preparedStatement.setInt(1, dto.getTestValue()))
-            .forFailedUpdates(Integer.class, SimpleDTO::setPrimaryKey);
+            .forGeneratedKeysAndFailedUpdates(Integer.class, SimpleDTO::setPrimaryKey);
 
     assertThat(failedUpdates).isEmpty();;
     assertNotNull(dto1.getPrimaryKey());

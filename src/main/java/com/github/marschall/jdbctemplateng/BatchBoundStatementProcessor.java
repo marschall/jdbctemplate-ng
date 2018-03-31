@@ -50,24 +50,24 @@ public final class BatchBoundStatementProcessor<T> {
     return pipeline.executeForPerBatchUpdateCountTranslated();
   }
 
-  public <K> List<FailedUpdate<T>> forFailedUpdates(Class<K> keyType, BiConsumer<T, K> callback) {
-    return forFailedUpdates(resultSet -> resultSet.getObject(1, keyType), callback);
+  public <K> List<FailedUpdate<T>> forGeneratedKeysAndFailedUpdates(Class<K> keyType, BiConsumer<T, K> callback) {
+    return this.forGeneratedKeysAndFailedUpdates(resultSet -> resultSet.getObject(1, keyType), callback);
   }
 
-  public <K> List<FailedUpdate<T>> forFailedUpdates(RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
+  public <K> List<FailedUpdate<T>> forGeneratedKeysAndFailedUpdates(RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
     BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> pipeline = new BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<>(
             this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter, keyExtractor, callback);
     return pipeline.forFailedUpdatesAndGeneratedKeys();
   }
 
   public List<FailedUpdate<T>> forFailedUpdates() {
-    BatchUpdateForFailedUpdatesPipeline<T> pipeline = new BatchUpdateForFailedUpdatesPipeline<>(
-            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
-    return pipeline.forFailedUpdates();
+    return this.forFailedUpdates(1);
   }
 
-  public <K> List<K> forGeneratedKeys(RowMapper<K> keyExtractor) {
-    return null;
+  public List<FailedUpdate<T>> forFailedUpdates(int expectedUpdateCount) {
+    BatchUpdateForFailedUpdatesPipeline<T> pipeline = new BatchUpdateForFailedUpdatesPipeline<>(
+            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
+    return pipeline.forFailedUpdates(expectedUpdateCount);
   }
 
 }

@@ -52,4 +52,11 @@ public class DerbyJdbcOperationBuilderTest extends AbstractJdbcOperationBuilderT
    return dataSource;
  }
 
+  @Override
+  void testBatchUpdateGeneratedKey() {
+    // https://issues.apache.org/jira/browse/DERBY-6994
+    // https://issues.apache.org/jira/browse/DERBY-3609
+    return;
+  }
+
 }

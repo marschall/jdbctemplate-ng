@@ -28,15 +28,15 @@ final class BatchUpdateForFailedUpdatesPipeline<T> {
     this.setter = setter;
   }
 
-  List<FailedUpdate<T>> forFailedUpdates() {
+  List<FailedUpdate<T>> forFailedUpdates(int expectedUpdateCount) {
     try {
-      return this.execute();
+      return this.execute(expectedUpdateCount);
     } catch (SQLException e) {
       throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
     }
   }
 
-  private List<FailedUpdate<T>> execute() throws SQLException {
+  private List<FailedUpdate<T>> execute(int expectedUpdateCount) throws SQLException {
     try (Connection connection = this.dataSource.getConnection();
          PreparedStatement preparedStatement = this.creator.createPreparedStatement(connection)) {
 
@@ -50,14 +50,14 @@ final class BatchUpdateForFailedUpdatesPipeline<T> {
         this.setter.setValues(preparedStatement, element);
         preparedStatement.addBatch();
 
-        if (indexInBatch == this.batchSize - 1 || rowIndex == elementCount - 1) {
+        if ((indexInBatch == (this.batchSize - 1)) || (rowIndex == (elementCount - 1))) {
           int[] batchUpdateCount = preparedStatement.executeBatch();
 
           for (int i = 0; i < batchUpdateCount.length; i++) {
             int updateCount = batchUpdateCount[i];
 
-            if (updateCount != 1) {
-              T updatedElement = this.batchArguments.get(batchIndex * this.batchSize + i);
+            if (updateCount != expectedUpdateCount) {
+              T updatedElement = this.batchArguments.get((batchIndex * this.batchSize) + i);
               failedUpdates.add(new FailedUpdate<>(updateCount, updatedElement));
             }
           }

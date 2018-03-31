@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ class JdbcTemplateCompatibilityTest {
   private JdbcOperations jdbcOperations;
 
   @Test // SPR-16578
+  @Disabled("Spring Bug")
   void caseInsensitiveKeys() {
     Map<String, Object> map = this.jdbcOperations.queryForMap("SELECT 1 as \"X\", 2 as \"x\" from dual");
 
