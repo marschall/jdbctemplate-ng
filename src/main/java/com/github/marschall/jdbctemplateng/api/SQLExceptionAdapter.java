@@ -7,7 +7,6 @@ import java.sql.SQLException;
  *
  * <p>Very similar to {@link org.springframework.jdbc.support.SQLExceptionTranslator}.</p>
  */
-@FunctionalInterface
 public interface SQLExceptionAdapter {
 
   /**
@@ -20,5 +19,13 @@ public interface SQLExceptionAdapter {
    * @return the unchecked exception instance
    */
   RuntimeException translate(String sql, SQLException exception);
+
+  RuntimeException unsupportedFeature(String featureName);
+
+  RuntimeException wrongUpdateCount(int expected, int actual, String sql);
+
+  RuntimeException wrongUpdateCount(long expected, long actual, String sql);
+
+  RuntimeException wrongResultSetSize(int expected, int actual, String sql);
 
 }
