@@ -1,5 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
+import static com.github.marschall.jdbctemplateng.SqlExtractor.extractSql;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -35,7 +37,7 @@ final class BatchUpdateForFailedUpdatesPipeline<T> {
     try {
       return this.execute(expectedUpdateCount);
     } catch (SQLException e) {
-      throw this.exceptionAdapter.translate(null, e);
+      throw this.exceptionAdapter.translate(extractSql(this.creator), e);
     }
   }
 

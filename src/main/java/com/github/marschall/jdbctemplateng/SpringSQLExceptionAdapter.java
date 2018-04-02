@@ -34,7 +34,7 @@ final class SpringSQLExceptionAdapter implements SQLExceptionAdapter {
   }
 
   @Override
-  public RuntimeException wrongUpdateCount(long expected, long actual, String sql) {
+  public RuntimeException wrongLargeUpdateCount(long expected, long actual, String sql) {
     return wrongUpdateCount((int) Long.min(expected, Integer.MAX_VALUE), (int) Long.min(actual, Integer.MAX_VALUE), sql);
   }
 

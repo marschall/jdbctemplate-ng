@@ -24,7 +24,7 @@ public interface SQLExceptionAdapter {
 
   RuntimeException wrongUpdateCount(int expected, int actual, String sql);
 
-  RuntimeException wrongUpdateCount(long expected, long actual, String sql);
+  RuntimeException wrongLargeUpdateCount(long expected, long actual, String sql);
 
   RuntimeException wrongResultSetSize(int expected, int actual, String sql);
 

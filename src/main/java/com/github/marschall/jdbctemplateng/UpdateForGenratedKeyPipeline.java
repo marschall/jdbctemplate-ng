@@ -1,5 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
+import static com.github.marschall.jdbctemplateng.SqlExtractor.extractSql;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,7 +39,7 @@ final class UpdateForGenratedKeyPipeline<T> {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw this.exceptionAdapter.translate(null, e);
+      throw this.exceptionAdapter.translate(extractSql(this.creator), e);
     }
   }
 
@@ -48,16 +50,16 @@ final class UpdateForGenratedKeyPipeline<T> {
 
       int updateCount = preparedStatement.executeUpdate();
       if (updateCount != 1) {
-        throw this.exceptionAdapter.wrongUpdateCount(1, updateCount, null);
+        throw this.exceptionAdapter.wrongUpdateCount(1, updateCount, extractSql(this.creator));
       }
 
       try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
         if (!generatedKeys.next()) {
-          throw this.exceptionAdapter.wrongResultSetSize(1, 0, null);
+          throw this.exceptionAdapter.wrongResultSetSize(1, 0, extractSql(this.creator));
         }
         T generatedKey = this.mapper.mapRow(generatedKeys);
         if (generatedKeys.next()) {
-          throw this.exceptionAdapter.wrongResultSetSize(1, 2, null);
+          throw this.exceptionAdapter.wrongResultSetSize(1, 2, extractSql(this.creator));
         }
         return generatedKey;
       }

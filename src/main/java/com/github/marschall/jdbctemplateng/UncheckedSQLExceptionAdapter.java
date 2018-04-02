@@ -36,7 +36,7 @@ final class UncheckedSQLExceptionAdapter implements SQLExceptionAdapter {
   }
 
   @Override
-  public RuntimeException wrongUpdateCount(long expected, long actual, String sql) {
+  public RuntimeException wrongLargeUpdateCount(long expected, long actual, String sql) {
     // TODO instance variables
     return new UncheckedSQLException("wrong update count, expected " + expected + " but was " + actual, sql);
   }

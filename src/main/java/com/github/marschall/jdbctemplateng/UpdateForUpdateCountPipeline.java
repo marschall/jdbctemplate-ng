@@ -1,5 +1,7 @@
 package com.github.marschall.jdbctemplateng;
 
+import static com.github.marschall.jdbctemplateng.SqlExtractor.extractSql;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,7 +34,7 @@ final class UpdateForUpdateCountPipeline {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw this.exceptionAdapter.translate(null, e);
+      throw this.exceptionAdapter.translate(extractSql(this.creator), e);
     }
   }
 
@@ -40,10 +42,10 @@ final class UpdateForUpdateCountPipeline {
     try {
       int actual = this.execute();
       if (actual != expected) {
-        throw this.exceptionAdapter.wrongUpdateCount(expected, actual, null);
+        throw this.exceptionAdapter.wrongUpdateCount(expected, actual, extractSql(this.creator));
       }
     } catch (SQLException e) {
-      throw this.exceptionAdapter.translate(null, e);
+      throw this.exceptionAdapter.translate(extractSql(this.creator), e);
     }
   }
 
