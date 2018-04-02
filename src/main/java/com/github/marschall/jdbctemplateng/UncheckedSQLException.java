@@ -3,12 +3,14 @@ package com.github.marschall.jdbctemplateng;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import com.github.marschall.jdbctemplateng.api.SqlProvider;
+
 /**
  * Wraps an {@link SQLException} with an unchecked exception.
  *
  * @see java.io.UncheckedIOException
  */
-public final class UncheckedSQLException extends RuntimeException {
+public final class UncheckedSQLException extends RuntimeException implements SqlProvider {
 
   private static final long serialVersionUID = 1L;
 

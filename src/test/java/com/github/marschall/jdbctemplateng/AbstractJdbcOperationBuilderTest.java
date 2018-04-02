@@ -138,6 +138,20 @@ abstract class AbstractJdbcOperationBuilderTest {
   }
 
   @Test
+  void exceptionContainsSql() {
+    String sql = "SELECT not_existing";
+    UncheckedSQLException exception = assertThrows(UncheckedSQLException.class, () -> {
+      this.builder
+        .query(sql)
+        .withoutBindParameters()
+        .map(RowMapper.toArray())
+        .collectToUniqueObject();
+    });
+
+    assertEquals(sql, exception.getSql());
+  }
+
+  @Test
   void withoutBindVariables() {
     Optional<Integer> integer = this.builder
             .query("SELECT 1 FROM single_row_table")
