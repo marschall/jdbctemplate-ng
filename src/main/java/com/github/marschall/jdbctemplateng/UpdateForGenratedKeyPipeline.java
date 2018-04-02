@@ -10,19 +10,24 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 final class UpdateForGenratedKeyPipeline<T> {
+
+  private final DataSource dataSource;
+
+  private final SQLExceptionAdapter exceptionAdapter;
 
   private final PreparedStatementCreator creator;
 
   private final PreparedStatementSetter setter;
 
-  private final DataSource dataSource;
-
   private final RowMapper<T> mapper;
 
-  UpdateForGenratedKeyPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper) {
+  UpdateForGenratedKeyPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.setter = setter;
     this.mapper = mapper;
@@ -32,7 +37,7 @@ final class UpdateForGenratedKeyPipeline<T> {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 
@@ -43,16 +48,16 @@ final class UpdateForGenratedKeyPipeline<T> {
 
       int updateCount = preparedStatement.executeUpdate();
       if (updateCount != 1) {
-        throw UncheckedSQLExceptionAdapter.wrongUpdateCount(1, updateCount, null);
+        throw this.exceptionAdapter.wrongUpdateCount(1, updateCount, null);
       }
 
       try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
         if (!generatedKeys.next()) {
-          throw UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 0, null);
+          throw this.exceptionAdapter.wrongResultSetSize(1, 0, null);
         }
         T generatedKey = this.mapper.mapRow(generatedKeys);
         if (generatedKeys.next()) {
-          throw UncheckedSQLExceptionAdapter.wrongResultSetSize(1, 2, null);
+          throw this.exceptionAdapter.wrongResultSetSize(1, 2, null);
         }
         return generatedKey;
       }

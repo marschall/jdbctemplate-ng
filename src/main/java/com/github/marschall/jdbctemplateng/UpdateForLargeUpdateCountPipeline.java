@@ -8,17 +8,22 @@ import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 final class UpdateForLargeUpdateCountPipeline {
 
   private final DataSource dataSource;
 
+  private final SQLExceptionAdapter exceptionAdapter;
+
   private final PreparedStatementCreator creator;
 
   private final PreparedStatementSetter setter;
 
-  UpdateForLargeUpdateCountPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter) {
+  UpdateForLargeUpdateCountPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, PreparedStatementSetter setter) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.setter = setter;
   }
@@ -27,7 +32,7 @@ final class UpdateForLargeUpdateCountPipeline {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 
@@ -35,10 +40,10 @@ final class UpdateForLargeUpdateCountPipeline {
     try {
       long actual = this.execute();
       if (actual != expected) {
-        throw UncheckedSQLExceptionAdapter.wrongUpdateCount(expected, actual, null);
+        throw this.exceptionAdapter.wrongUpdateCount(expected, actual, null);
       }
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 

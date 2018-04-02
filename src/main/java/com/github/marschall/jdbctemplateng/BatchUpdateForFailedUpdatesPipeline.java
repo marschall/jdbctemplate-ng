@@ -10,18 +10,21 @@ import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 final class BatchUpdateForFailedUpdatesPipeline<T> {
 
   private final DataSource dataSource;
+  private final SQLExceptionAdapter exceptionAdapter;
   private final PreparedStatementCreator creator;
   private final List<T> batchArguments;
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchUpdateForFailedUpdatesPipeline(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
-          ParameterizedPreparedStatementSetter<T> setter) {
+  BatchUpdateForFailedUpdatesPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, List<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.batchArguments = batchArguments;
     this.batchSize = batchSize;
@@ -32,7 +35,7 @@ final class BatchUpdateForFailedUpdatesPipeline<T> {
     try {
       return this.execute(expectedUpdateCount);
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 

@@ -9,17 +9,21 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 public final class BatchBoundStatementProcessor<T> {
 
   private final DataSource dataSource;
+  private final SQLExceptionAdapter exceptionAdapter;
   private final PreparedStatementCreator creator;
   private final List<T> batchArgs;
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchBoundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  BatchBoundStatementProcessor(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, List<T> batchArgs, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.batchArgs = batchArgs;
     this.batchSize = batchSize;
@@ -46,7 +50,7 @@ public final class BatchBoundStatementProcessor<T> {
 
   public int[][] forPerBatchUpdateCount() {
     BatchUpdateForUpdateCountPipeline<T> pipeline = new BatchUpdateForUpdateCountPipeline<>(
-            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
+            this.dataSource, this.exceptionAdapter, this.creator, this.batchArgs, this.batchSize, this.setter);
     return pipeline.executeForPerBatchUpdateCountTranslated();
   }
 
@@ -56,7 +60,7 @@ public final class BatchBoundStatementProcessor<T> {
 
   public <K> List<FailedUpdate<T>> forGeneratedKeysAndFailedUpdates(RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
     BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> pipeline = new BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<>(
-            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter, keyExtractor, callback);
+            this.dataSource, this.exceptionAdapter, this.creator, this.batchArgs, this.batchSize, this.setter, keyExtractor, callback);
     return pipeline.forFailedUpdatesAndGeneratedKeys();
   }
 
@@ -65,8 +69,11 @@ public final class BatchBoundStatementProcessor<T> {
   }
 
   public List<FailedUpdate<T>> forFailedUpdates(int expectedUpdateCount) {
+    if (expectedUpdateCount < 0) {
+      throw new IllegalArgumentException("expected update count must be positive");
+    }
     BatchUpdateForFailedUpdatesPipeline<T> pipeline = new BatchUpdateForFailedUpdatesPipeline<>(
-            this.dataSource, this.creator, this.batchArgs, this.batchSize, this.setter);
+            this.dataSource, this.exceptionAdapter, this.creator, this.batchArgs, this.batchSize, this.setter);
     return pipeline.forFailedUpdates(expectedUpdateCount);
   }
 

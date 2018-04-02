@@ -14,10 +14,12 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 final class BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> {
 
   private final DataSource dataSource;
+  private final SQLExceptionAdapter exceptionAdapter;
   private final PreparedStatementCreator creator;
   private final List<T> batchArguments;
   private final int batchSize;
@@ -25,9 +27,11 @@ final class BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> {
   private final RowMapper<K> keyExtractor;
   private final BiConsumer<T, K> callback;
 
-  BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline(DataSource dataSource, PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
+  BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, List<T> batchArguments, int batchSize,
           ParameterizedPreparedStatementSetter<T> setter, RowMapper<K> keyExtractor, BiConsumer<T, K> callback) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.batchArguments = batchArguments;
     this.batchSize = batchSize;
@@ -40,7 +44,7 @@ final class BatchUpdateForFailedUpdatesAndGeneratedKeysPipeline<T, K> {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 

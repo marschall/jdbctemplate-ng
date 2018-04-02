@@ -9,17 +9,21 @@ import javax.sql.DataSource;
 
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 final class BatchUpdateForUpdateCountPipeline<T> {
 
   private final DataSource dataSource;
+  private final SQLExceptionAdapter exceptionAdapter;
   private final PreparedStatementCreator creator;
   private final Collection<T> batchArguments;
   private final int batchSize;
   private final ParameterizedPreparedStatementSetter<T> setter;
 
-  BatchUpdateForUpdateCountPipeline(DataSource dataSource, PreparedStatementCreator creator, Collection<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
+  BatchUpdateForUpdateCountPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, Collection<T> batchArguments, int batchSize, ParameterizedPreparedStatementSetter<T> setter) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.batchArguments = batchArguments;
     this.batchSize = batchSize;
@@ -30,7 +34,7 @@ final class BatchUpdateForUpdateCountPipeline<T> {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 

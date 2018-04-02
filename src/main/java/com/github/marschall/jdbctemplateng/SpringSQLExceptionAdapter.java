@@ -2,6 +2,7 @@ package com.github.marschall.jdbctemplateng;
 
 import java.sql.SQLException;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
@@ -34,12 +35,14 @@ final class SpringSQLExceptionAdapter implements SQLExceptionAdapter {
 
   @Override
   public RuntimeException wrongUpdateCount(long expected, long actual, String sql) {
-    // TODO Auto-generated method stub
-    return null;
+    return wrongUpdateCount((int) Long.min(expected, Integer.MAX_VALUE), (int) Long.min(actual, Integer.MAX_VALUE), sql);
   }
 
   @Override
   public RuntimeException wrongResultSetSize(int expected, int actual, String sql) {
+    if (expected == 0) {
+      return new EmptyResultDataAccessException(expected);
+    }
     return new IncorrectResultSizeDataAccessException(sql, expected, actual);
   }
 

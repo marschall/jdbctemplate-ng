@@ -15,7 +15,7 @@ class OracleJdbcOperationBuilderTest {
 
   @BeforeEach
   void setUp() {
-    this.jdbcTemplate = new JdbcOperationBuilder(null, NamedPreparedStatementSetterFactory.oracle());
+    this.jdbcTemplate = new JdbcOperationBuilder(null, UncheckedSQLExceptionAdapter.INSTANCE, NamedPreparedStatementSetterFactory.oracle());
   }
 
   @Test

@@ -26,6 +26,7 @@ features not supported:
 
 TODO
 ====
+- SqlProvider
 - tests for failed updates
 - unprepared statement for statements without bind parameters
 

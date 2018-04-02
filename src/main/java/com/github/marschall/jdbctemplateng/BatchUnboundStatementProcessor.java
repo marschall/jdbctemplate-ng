@@ -10,16 +10,18 @@ import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFacto
 import com.github.marschall.jdbctemplateng.api.ParameterizedPreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCustomizer;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 public final class BatchUnboundStatementProcessor extends UnboundStatementProcessor {
 
-  BatchUnboundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
-    super(dataSource, creator, namedFactory);
+  BatchUnboundStatementProcessor(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
+    super(dataSource, exceptionAdapter, creator, namedFactory);
   }
 
   public BatchUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
     Objects.requireNonNull(customizer, "customizer");
-    return new BatchUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer), this.namedFactory);
+    return new BatchUnboundStatementProcessor(this.dataSource, this.exceptionAdapter, this.decorateCreator(customizer), this.namedFactory);
   }
 
   public BatchBoundStatementProcessor<Object[]> binding(List<Object[]> batchArgs) {
@@ -41,7 +43,7 @@ public final class BatchUnboundStatementProcessor extends UnboundStatementProces
       throw new IllegalArgumentException("batch size must be positive");
     }
     Objects.requireNonNull(setter, "setter");
-    return new BatchBoundStatementProcessor<>(this.dataSource, this.creator, batchArgs, batchSize, setter);
+    return new BatchBoundStatementProcessor<>(this.dataSource, this.exceptionAdapter, this.creator, batchArgs, batchSize, setter);
   }
 
 }

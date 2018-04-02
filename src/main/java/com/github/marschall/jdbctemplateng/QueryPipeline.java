@@ -13,10 +13,13 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
 import com.github.marschall.jdbctemplateng.api.RowMapper;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 class QueryPipeline<T, R, A> {
 
   private final DataSource dataSource;
+
+  private final SQLExceptionAdapter exceptionAdapter;
 
   private final PreparedStatementCreator creator;
 
@@ -27,8 +30,10 @@ class QueryPipeline<T, R, A> {
   private final Collector<? super T, A, R> collector;
 
 
-  QueryPipeline(DataSource dataSource, PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper, Collector<? super T, A, R> collector) {
+  QueryPipeline(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, PreparedStatementSetter setter, RowMapper<T> mapper, Collector<? super T, A, R> collector) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.setter = setter;
     this.mapper = mapper;
@@ -39,7 +44,7 @@ class QueryPipeline<T, R, A> {
     try {
       return this.execute();
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(null, e);
+      throw this.exceptionAdapter.translate(null, e);
     }
   }
 

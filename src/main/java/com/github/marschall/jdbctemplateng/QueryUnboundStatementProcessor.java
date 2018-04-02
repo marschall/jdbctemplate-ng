@@ -13,16 +13,18 @@ import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFacto
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCustomizer;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 public final class QueryUnboundStatementProcessor extends UnboundStatementProcessor {
 
-  QueryUnboundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
-    super(dataSource, creator, namedFactory);
+  QueryUnboundStatementProcessor(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
+    super(dataSource, exceptionAdapter, creator, namedFactory);
   }
 
   public QueryBoundStatementProcessor binding(PreparedStatementSetter preparedStatementSetter) {
     Objects.requireNonNull(preparedStatementSetter, "preparedStatementSetter");
-    return new QueryBoundStatementProcessor(this.dataSource, this.creator, preparedStatementSetter);
+    return new QueryBoundStatementProcessor(this.dataSource, this.exceptionAdapter, this.creator, preparedStatementSetter);
   }
 
 
@@ -81,7 +83,7 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
 
   public QueryBoundStatementProcessor binding(Collection<Entry<String, Object>> bindParameters) {
     Objects.requireNonNull(bindParameters, "bindParameters");
-    return new QueryBoundStatementProcessor(this.dataSource, this.creator, this.namedFactory.newNamedPreparedStatementSetter(bindParameters));
+    return new QueryBoundStatementProcessor(this.dataSource, this.exceptionAdapter, this.creator, this.namedFactory.newNamedPreparedStatementSetter(bindParameters));
   }
 
   // REVIEW can we skip this
@@ -98,7 +100,7 @@ public final class QueryUnboundStatementProcessor extends UnboundStatementProces
 
   public QueryUnboundStatementProcessor customizeStatement(PreparedStatementCustomizer customizer) {
     Objects.requireNonNull(customizer, "customizer");
-    return new QueryUnboundStatementProcessor(this.dataSource, this.decorateCreator(customizer), this.namedFactory);
+    return new QueryUnboundStatementProcessor(this.dataSource, this.exceptionAdapter, this.decorateCreator(customizer), this.namedFactory);
   }
 
   static final class SimpleEntry implements Entry<String, Object> {

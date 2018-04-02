@@ -6,15 +6,19 @@ import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFacto
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCustomizer;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 abstract class UnboundStatementProcessor {
 
   final DataSource dataSource;
+  final SQLExceptionAdapter exceptionAdapter;
   final PreparedStatementCreator creator;
   final NamedPreparedStatementSetterFactory namedFactory;
 
-  UnboundStatementProcessor(DataSource dataSource, PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
+  UnboundStatementProcessor(DataSource dataSource, SQLExceptionAdapter exceptionAdapter,
+          PreparedStatementCreator creator, NamedPreparedStatementSetterFactory namedFactory) {
     this.dataSource = dataSource;
+    this.exceptionAdapter = exceptionAdapter;
     this.creator = creator;
     this.namedFactory = namedFactory;
   }

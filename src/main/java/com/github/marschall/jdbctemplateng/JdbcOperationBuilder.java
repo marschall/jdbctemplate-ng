@@ -12,22 +12,27 @@ import javax.sql.DataSource;
 import com.github.marschall.jdbctemplateng.api.NamedPreparedStatementSetterFactory;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementCreator;
 import com.github.marschall.jdbctemplateng.api.PreparedStatementSetter;
+import com.github.marschall.jdbctemplateng.api.SQLExceptionAdapter;
 
 public final class JdbcOperationBuilder {
 
   private final DataSource dataSource;
 
+  private final SQLExceptionAdapter exceptionAdapter;
+
   private final NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory;
 
-  public JdbcOperationBuilder(DataSource dataSource, NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory) {
+  public JdbcOperationBuilder(DataSource dataSource, SQLExceptionAdapter exceptionAdapter, NamedPreparedStatementSetterFactory namedPreparedStatementSetterFactory) {
+    this.exceptionAdapter = exceptionAdapter;
     Objects.requireNonNull(dataSource, "dataSource");
+    Objects.requireNonNull(exceptionAdapter, "exceptionAdapter");
     Objects.requireNonNull(namedPreparedStatementSetterFactory, "namedPreparedStatementSetterFactory");
     this.dataSource = dataSource;
     this.namedPreparedStatementSetterFactory = namedPreparedStatementSetterFactory;
   }
 
   public JdbcOperationBuilder(DataSource dataSource) {
-    this(dataSource, UnsupportedNamedPreparedStatementSetterFactory.INSTANCE);
+    this(dataSource, UncheckedSQLExceptionAdapter.INSTANCE, new UnsupportedNamedPreparedStatementSetterFactory(UncheckedSQLExceptionAdapter.INSTANCE));
   }
 
   public void execute(String sql) {
@@ -35,13 +40,13 @@ public final class JdbcOperationBuilder {
          Statement statement = connection.createStatement()) {
       statement.execute(sql);
     } catch (SQLException e) {
-      throw UncheckedSQLExceptionAdapter.INSTANCE.translate(sql, e);
+      throw this.exceptionAdapter.translate(sql, e);
     }
   }
 
   public QueryUnboundStatementProcessor query(PreparedStatementCreator preparedStatementCreator) {
     Objects.requireNonNull(preparedStatementCreator, "preparedStatementCreator");
-    return new QueryUnboundStatementProcessor(this.dataSource, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
+    return new QueryUnboundStatementProcessor(this.dataSource, this.exceptionAdapter, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
   }
 
   public QueryUnboundStatementProcessor query(String sql) {
@@ -83,7 +88,7 @@ public final class JdbcOperationBuilder {
 
   public UpdateUnboundStatementProcessor update(PreparedStatementCreator preparedStatementCreator) {
     Objects.requireNonNull(preparedStatementCreator, "preparedStatementCreator");
-    return new UpdateUnboundStatementProcessor(this.dataSource, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
+    return new UpdateUnboundStatementProcessor(this.dataSource, this.exceptionAdapter, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
   }
 
   public BatchUnboundStatementProcessor batchUpdate(String sql) {
@@ -110,16 +115,20 @@ public final class JdbcOperationBuilder {
 
   public BatchUnboundStatementProcessor batchUpdate(PreparedStatementCreator preparedStatementCreator) {
     Objects.requireNonNull(preparedStatementCreator, "preparedStatementCreator");
-    return new BatchUnboundStatementProcessor(this.dataSource, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
+    return new BatchUnboundStatementProcessor(this.dataSource, this.exceptionAdapter, preparedStatementCreator, this.namedPreparedStatementSetterFactory);
   }
 
   static final class UnsupportedNamedPreparedStatementSetterFactory implements NamedPreparedStatementSetterFactory {
 
-    static final NamedPreparedStatementSetterFactory INSTANCE = new UnsupportedNamedPreparedStatementSetterFactory();
+    private final SQLExceptionAdapter exceptionAdapter;
+
+    UnsupportedNamedPreparedStatementSetterFactory(SQLExceptionAdapter exceptionAdapter) {
+      this.exceptionAdapter = exceptionAdapter;
+    }
 
     @Override
     public PreparedStatementSetter newNamedPreparedStatementSetter(Collection<Entry<String, Object>> namedParameters) {
-      throw UncheckedSQLExceptionAdapter.unsupportedFeature("named parameters");
+      throw this.exceptionAdapter.unsupportedFeature("named parameters");
     }
 
   }
