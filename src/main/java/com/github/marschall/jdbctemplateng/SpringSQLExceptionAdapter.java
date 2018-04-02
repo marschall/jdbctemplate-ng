@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 
@@ -24,8 +25,7 @@ final class SpringSQLExceptionAdapter implements SQLExceptionAdapter {
 
   @Override
   public RuntimeException unsupportedFeature(String featureName) {
-    // TODO Auto-generated method stub
-    return null;
+    return new InvalidDataAccessApiUsageException("unsupported feature '" + featureName + "'");
   }
 
   @Override

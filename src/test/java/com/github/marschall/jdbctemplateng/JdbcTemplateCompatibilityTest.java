@@ -2,9 +2,13 @@ package com.github.marschall.jdbctemplateng;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +18,12 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -41,6 +48,19 @@ class JdbcTemplateCompatibilityTest {
 
     assertEquals(Integer.valueOf(1), map.get("X"));
     assertEquals(Integer.valueOf(1), map.get("x"));
+  }
+
+  @Test
+  public void unsupportedFeature() {
+    assertThrows(InvalidDataAccessApiUsageException.class, (Executable) () -> {
+      this.jdbcOperations.execute(new ConnectionCallback<Void>() {
+
+        @Override
+        public Void doInConnection(Connection con) throws SQLException {
+          throw new SQLFeatureNotSupportedException();
+        }
+      });
+    });
   }
 
   @Test
