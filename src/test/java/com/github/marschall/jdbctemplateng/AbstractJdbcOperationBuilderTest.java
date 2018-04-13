@@ -282,7 +282,7 @@ abstract class AbstractJdbcOperationBuilderTest {
             .binding(dtos, 10, (preparedStatement, dto) -> preparedStatement.setInt(1, dto.getTestValue()))
             .forGeneratedKeysAndFailedUpdates(Integer.class, SimpleDTO::setPrimaryKey);
 
-    assertThat(failedUpdates).isEmpty();;
+    assertThat(failedUpdates).isEmpty();
     assertNotNull(dto1.getPrimaryKey());
     assertNotNull(dto2.getPrimaryKey());
   }
@@ -295,7 +295,7 @@ abstract class AbstractJdbcOperationBuilderTest {
             .binding(batchArgs)
             .forFailedUpdates();
 
-    assertThat(failedUpdates).isEmpty();;
+    assertThat(failedUpdates).isEmpty();
   }
 
   static final class SimpleDTO {

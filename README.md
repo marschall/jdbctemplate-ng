@@ -7,7 +7,7 @@ This project has the following goals:
 
 - support Optional
 - reduce the number of methods on JdbcOperations
-- support named parameters
+- native support named parameters (Oracle, IBM DB2)
 
 additional features:
 - more control over return type by use of a collector
@@ -26,7 +26,6 @@ features not supported:
 
 TODO
 ====
-- SqlProvider
 - tests for failed updates
 - unprepared statement for statements without bind parameters
 
