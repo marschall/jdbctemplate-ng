@@ -117,7 +117,7 @@
     <dependency>
       <groupId>org.firebirdsql.jdbc</groupId>
       <artifactId>jaybird</artifactId>
-      <version>4.0.6.java8</version>
+      <version>5.0.2.java8</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -135,7 +135,7 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.1.4</version>
+      <version>3.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
